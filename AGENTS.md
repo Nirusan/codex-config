@@ -69,6 +69,79 @@ Global instructions applied to all Next.js/React projects.
 
 - **Production-ready** designs, not generic or cookie-cutter
 
+## MCP Gemini Design - Mandatory Unique Workflow
+
+### Absolute Rule
+
+You NEVER write frontend/UI code yourself. Gemini is your frontend developer.
+
+### Available Tools
+
+- `generate_vibes`: Generates a visual page with 5 differently styled sections. The user opens the page, sees all 5 vibes, and picks their favorite. The code from the chosen vibe becomes `design-system.md`.
+- `create_frontend`: Creates a NEW complete file (page, component, section).
+- `modify_frontend`: Makes ONE design modification to existing code. Returns a FIND/REPLACE block to apply.
+- `snippet_frontend`: Generates a code snippet to INSERT into an existing file. For adding elements without rewriting the entire file.
+
+### Workflow (No Alternatives)
+
+#### Step 1: Check for `design-system.md`
+
+BEFORE any frontend call, check if `design-system.md` exists at project root.
+
+#### Step 2A: If `design-system.md` DOES NOT EXIST
+
+1. Call `generate_vibes` with `projectDescription`, `projectType`, `techStack`.
+2. Receive the code for a page with 5 visual sections.
+3. Ask: "You don't have a design system. Can I create vibes-selection.tsx so you can visually choose your style?"
+4. If yes, write the page to the file.
+5. User chooses: "vibe 3" or "the 5th one".
+6. Extract THE ENTIRE CODE between `<!-- VIBE_X_START -->` and `<!-- VIBE_X_END -->`.
+7. Save it to `design-system.md`.
+8. Ask: "Delete vibes-selection.tsx?"
+9. Continue normally.
+
+#### Step 2B: If `design-system.md` EXISTS
+
+Read it and use its content for frontend calls.
+
+#### Step 3: Frontend Calls
+
+For EVERY call (`create_frontend`, `modify_frontend`, `snippet_frontend`), you MUST pass:
+
+- `designSystem`: Copy-paste the ENTIRE content of `design-system.md` (all the code, not a summary).
+- `context`: Functional/business context WITH ALL REAL DATA. Include:
+  - What it does, features, requirements.
+  - ALL real text/labels to display (status labels, button text, titles...).
+  - ALL real data values (prices, stats, numbers...).
+  - Enum values and their exact meaning.
+  - Any business-specific information.
+
+WHY: Gemini will use placeholders `[Title]`, `[Price]` for missing info. If you don't provide real data, you'll get placeholders or worse - fake data.
+
+### Forbidden
+
+- Writing frontend without Gemini.
+- Skipping the vibes workflow when `design-system.md` is missing.
+- Extracting "rules" instead of THE ENTIRE code.
+- Manually creating `design-system.md`.
+- Passing design/styling info in `context` (that goes in `designSystem`).
+- Summarizing the design system instead of copy-pasting it entirely.
+- Calling Gemini without providing real data (labels, stats, prices, etc.) → leads to fake info.
+
+### Expected
+
+- Check for `design-system.md` BEFORE anything.
+- Follow the complete vibes workflow if missing.
+- Pass the FULL `design-system.md` content in `designSystem`.
+- Pass functional context in `context` (purpose, features, requirements).
+
+### Exceptions (You Can Code These Yourself)
+
+- Text-only changes.
+- JS logic without UI.
+- Non-visual bug fixes.
+- Data wiring (`useQuery`, etc.).
+
 ## Tools & Documentation
 
 - Prefer local docs first (`README.md`, `docs/`, `AGENTS.md`)

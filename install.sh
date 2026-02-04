@@ -113,6 +113,45 @@ install_file() {
   fi
 }
 
+extract_mcp_sections() {
+  local file="$1"
+  awk '
+    /^\[mcp_servers(\.|$)/ { keep=1 }
+    /^\[/ && $0 !~ /^\[mcp_servers(\.|$)/ { keep=0 }
+    keep { print }
+  ' "$file"
+}
+
+strip_mcp_sections() {
+  local file="$1"
+  awk '
+    /^\[mcp_servers(\.|$)/ { skip=1; next }
+    /^\[/ && $0 !~ /^\[mcp_servers(\.|$)/ { skip=0 }
+    !skip { print }
+  ' "$file"
+}
+
+merge_mcp_sections() {
+  local new_file="$1"
+  local old_file="$2"
+  local tmp_new
+  local tmp_mcp
+  tmp_new="$(mktemp)"
+  tmp_mcp="$(mktemp)"
+
+  extract_mcp_sections "$old_file" > "$tmp_mcp"
+  if [[ -s "$tmp_mcp" ]]; then
+    strip_mcp_sections "$new_file" > "$tmp_new"
+    {
+      cat "$tmp_new"
+      echo ""
+      cat "$tmp_mcp"
+    } > "$new_file"
+  fi
+
+  rm -f "$tmp_new" "$tmp_mcp"
+}
+
 install_skill() {
   local skill_name="$1"
   mkdir -p "$CODEX_DIR/skills/$skill_name"
@@ -127,10 +166,26 @@ install_skill() {
 echo "==> Copying config files..."
 if [[ "$INSTALL_MODE" == "project" ]]; then
   install_file "config/AGENTS.md" "$AGENTS_TARGET"
+  existing_config="$(mktemp)"
+  if [[ -f "$CODEX_DIR/config.toml" ]]; then
+    cp "$CODEX_DIR/config.toml" "$existing_config"
+  fi
   install_file "config/config.toml" "$CODEX_DIR/config.toml"
+  if [[ -s "$existing_config" ]]; then
+    merge_mcp_sections "$CODEX_DIR/config.toml" "$existing_config"
+  fi
+  rm -f "$existing_config"
 else
   install_file "config/AGENTS.md" "$AGENTS_TARGET"
+  existing_config="$(mktemp)"
+  if [[ -f "$CODEX_DIR/config.toml" ]]; then
+    cp "$CODEX_DIR/config.toml" "$existing_config"
+  fi
   install_file "config/config.toml" "$CODEX_DIR/config.toml"
+  if [[ -s "$existing_config" ]]; then
+    merge_mcp_sections "$CODEX_DIR/config.toml" "$existing_config"
+  fi
+  rm -f "$existing_config"
 fi
 
 # Install skills

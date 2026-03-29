@@ -142,6 +142,19 @@ WHY: Gemini will use placeholders `[Title]`, `[Price]` for missing info. If you 
 - Non-visual bug fixes.
 - Data wiring (`useQuery`, etc.).
 
+## Skill Routing Heuristics
+
+Use the built-in skill system normally. Do not force a separate router workflow. When the task clearly matches a skill, prefer that skill early instead of improvising.
+
+- If resuming after a break or entering an unfamiliar repo state, use `refresh-context`.
+- If the user asks what to do next, use `next-task`.
+- If the work is already scoped and implementation-ready, use `implement`.
+- If the task would benefit from isolation or parallel branch work, use `worktree-setup`.
+- If a bug is flaky, surprising, or resists the obvious fix, use `systematic-debugging` before editing.
+- If the request is still fuzzy or product-level, use `brainstorm`, `prd`, `tech-stack`, or `implementation-plan` instead of jumping into code.
+- Before claiming a fix is done, a feature is ready, or a merge is safe, use `completion-verification`.
+- Treat `git-add-commit-push` and `validate-update-push` as explicit endgame skills, not automatic defaults.
+
 ## Tools & Documentation
 
 - Prefer local docs first (`README.md`, `docs/`, `AGENTS.md`)

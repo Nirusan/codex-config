@@ -1,193 +1,104 @@
 ---
 name: implementation-plan
-description: Create a detailed implementation plan with stories. Also creates an empty progress.md for tracking.
+description: Use when requirements are concrete enough to break work into implementable stories. Produces a phased implementation plan and a matching progress tracker, with dependencies, likely files, acceptance criteria, and verification steps. Do not use for vague ideation, pure architecture work, or direct coding without planning.
 ---
 
-# Implementation Plan Skill
+# Implementation Plan
 
-Create a detailed implementation plan broken down into stories, plus an empty progress tracker.
+Use this skill to turn requirements into a buildable sequence.
 
-## Usage
+## Use when
 
-```
-/implementation-plan                      # Main project → memory-bank/plan.md
-/implementation-plan --feature=dark-mode  # Feature → memory-bank/features/dark-mode/plan.md
-/plan                                     # Alias for /implementation-plan
-/plan --feature=dark-mode                 # Alias with feature
-```
+- the user wants a phased implementation plan
+- the PRD or technical context is strong enough to define stories
+- the next question is "how should we build this?"
 
-## Behavior
+## Don't use when
 
-1. **Determine output location** based on `--feature` parameter
-2. **Spawn the Architect agent** to create the plan
-3. Agent reads PRD and tech-stack, then breaks down into implementable stories
-4. Agent creates both `plan.md` and `progress.md`
+- the feature is still vague
+- the main need is product discovery or architecture choice
+- the user explicitly wants immediate implementation without a formal plan
 
-## Instructions
+## Goal
 
-When this skill is invoked:
+Break the work into small, dependency-aware stories that can be executed with confidence.
 
-1. **Parse arguments**:
-   - If `--feature=X` provided, set `feature_name = X`
-   - Otherwise, `feature_name = null` (main project plan)
+## Workflow
 
-2. **Determine paths**:
-   ```
-   If feature_name:
-     output_dir = memory-bank/features/{feature_name}/
-     plan_file = memory-bank/features/{feature_name}/plan.md
-     progress_file = memory-bank/features/{feature_name}/progress.md
-     prd_file = memory-bank/features/{feature_name}/prd.md (if exists, else main prd.md)
-   Else:
-     output_dir = memory-bank/
-     plan_file = memory-bank/plan.md
-     progress_file = memory-bank/progress.md
-     prd_file = memory-bank/prd.md
-   ```
+1. Read the best available context:
+   - PRD
+   - tech-stack or equivalent architecture notes
+   - brief if requirements are still light
+   - `AGENTS.md`
+2. Determine whether the plan is:
+   - for the main project
+   - for a specific feature
+3. Follow the repo's existing documentation layout if one exists.
+4. If requirements are incomplete, state the assumptions clearly instead of blocking on perfection.
+5. Write:
+   - a `plan.md`
+   - a `progress.md`
 
-3. **Check for existing context**:
-   ```
-   Read {prd_file} - REQUIRED (fail if not found)
-   Read memory-bank/tech-stack.md - REQUIRED (fail if not found)
-   Read memory-bank/brief.md if it exists
-   Read AGENTS.md if it exists
-   ```
+## Output path
 
-4. **Validate prerequisites**:
-   If PRD or tech-stack doesn't exist, inform user:
-   > "Missing prerequisites. Please run `/prd` and `/tech-stack` first."
+Prefer this order:
 
-5. **Create output directory** if needed:
-   ```bash
-   mkdir -p {output_dir}
-   ```
+1. `memory-bank/features/<feature-name>/plan.md` and `progress.md` if that structure exists
+2. `memory-bank/plan.md` and `memory-bank/progress.md`
+3. `docs/implementation-plan.md` and `docs/progress.md`
 
-6. **Spawn the Architect agent**:
-   Use the Task tool with `subagent_type: "architect"` (custom agent).
+## Plan expectations
 
-   Prompt for the agent:
-   ```
-   You are creating an implementation plan for: {feature_name or "the main product"}
+- group stories by dependency, not by team fantasy
+- keep stories small enough for one focused implementation session
+- include likely files or system areas affected
+- include verification notes
+- call out blockers and sequencing risks
 
-   Context:
-   - PRD: {full content of prd_file}
-   - Tech Stack: {full content of tech-stack.md}
-   - Brief: {summary if exists}
+## Plan structure
 
-   Your goal:
-   1. Break down the PRD into implementable stories
-   2. Order stories by dependency (foundational work first)
-   3. Keep stories small (completable in one session)
-   4. Include specific tasks and acceptance criteria per story
-   5. Add technical notes to help the implementer
-
-   Create TWO files:
-   1. {plan_file} - The implementation plan
-   2. {progress_file} - Empty progress tracker with story checklist
-
-   Output the plan now. Do not ask questions - you have all the context needed.
-   ```
-
-7. **Agent creates both files**
-
-## Output Location
-
-```
-# Main project
-memory-bank/
-├── plan.md
-└── progress.md
-
-# Feature-specific
-memory-bank/
-└── features/
-    └── {feature-name}/
-        ├── plan.md
-        └── progress.md
-```
-
-## Plan Template
-
-```markdown
-# Implementation Plan: {Feature/Product Name}
+```md
+# Implementation Plan: {Name}
 
 ## Overview
-{Summary of what we're building and technical approach}
+{What is being built and how}
 
-## Prerequisites
-- {Any setup needed before starting}
+## Assumptions
+- {assumption}
 
-## Stories
-
+## Phases
 ### Phase 1: Foundation
-| # | Story | Description | Complexity |
-|---|-------|-------------|------------|
-| 1 | {title} | {what to implement} | S/M/L |
-| 2 | {title} | {what to implement} | S/M/L |
+| # | Story | Goal | Complexity |
+|---|-------|------|------------|
 
-### Phase 2: Core Features
-| # | Story | Description | Complexity |
-|---|-------|-------------|------------|
-| 3 | {title} | {what to implement} | S/M/L |
-
-### Phase 3: Polish & Edge Cases
-| # | Story | Description | Complexity |
-|---|-------|-------------|------------|
-| N | {title} | {what to implement} | S/M/L |
-
-## Story Details
-
+## Story details
 ### Story 1: {Title}
-**Goal**: {What this achieves}
+**Goal**: {what this enables}
 
-**Tasks**:
-- [ ] {Specific implementation task}
-- [ ] {Specific implementation task}
-- [ ] {Write tests for X}
+**Tasks**
+- [ ] {task}
+- [ ] {task}
 
-**Acceptance Criteria**:
-- [ ] {User-facing criterion}
-- [ ] {Technical criterion}
+**Acceptance Criteria**
+- [ ] {criterion}
 
-**Technical Notes**:
-- {Pattern to follow}
-- {Gotcha to avoid}
-- {Reference to similar code if brownfield}
+**Likely files / systems**
+- `path/to/file`
 
-**Files likely to change**:
-- `path/to/file.ts`
-- `path/to/other.ts`
+**Verification**
+- {what to check}
 
----
-
-### Story 2: {Title}
-{Same format}
-
----
-
-## Dependencies
-- Story 2 depends on Story 1 (needs X component)
-- Story 4 depends on Story 3 (needs API endpoint)
-
-## Risks & Mitigations
-| Risk | Mitigation |
-|------|------------|
-| {Technical risk} | {How to handle} |
-
-## Definition of Done
-- [ ] All tasks completed
-- [ ] Tests passing
-- [ ] Code reviewed (if applicable)
-- [ ] No TypeScript errors
-- [ ] Acceptance criteria met
+**Dependencies**
+- {if any}
 ```
 
-## Progress Template
+## Progress structure
 
-```markdown
-# Progress: {Feature/Product Name}
+```md
+# Progress: {Name}
 
-## Status: Not Started
+## Status
+Not started
 
 ## Current Story
 None
@@ -201,19 +112,21 @@ None
 ## Remaining
 - [ ] Story 1: {title}
 - [ ] Story 2: {title}
-- [ ] Story 3: {title}
-- [ ] Story 4: {title}
-...
 
 ## Notes
-{Any blockers, decisions, or observations during implementation}
+- {important decisions, blockers, or assumptions}
 ```
 
-## Next Step
+## Writing rules
 
-After creating the plan, output:
-> "Plan created with {N} stories:
-> - `{plan_file}`
-> - `{progress_file}`
->
-> Run `/implement` to start building (or `/implement --feature={name}` for features)."
+- Prefer realistic implementation order over pretty phase names.
+- Separate implementation tasks from manual validation tasks.
+- Do not fake certainty about files or estimates.
+- Keep the first version lean; refinement can happen later.
+
+## Suggested next step
+
+After creating the plan, the natural next skills are:
+
+- `$next-task`
+- `$implement`

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Completion Verification"
+  short_description: "Verify claims before saying work is done"
+  default_prompt: "Use $completion-verification before deciding whether this change is actually ready."
+
+policy:
+  allow_implicit_invocation: true

@@ -61,7 +61,8 @@ cd /path/to/your/project
 
 ### Configuration Codex
 
-- `config/config.toml` → `~/.codex/config.toml` (ou `./.codex/config.toml`)
+- `config/config.example.toml` → `~/.codex/config.toml` (ou `./.codex/config.toml`)
+- Modèle public-safe uniquement : aucune vraie clé API ni chemin de projet personnel n'est versionné dans ce repo
 - Modèle, approbations, sandbox, web search
 - MCP servers (OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, Chrome DevTools, Gemini Design, n8n)
 
@@ -85,6 +86,8 @@ git pull
 cd /path/to/codex-config
 ./sync.sh
 ```
+
+`./sync.sh` met à jour `config/config.example.toml`, pas ton vrai `config.toml` local. Relis toujours le template généré avant commit pour vérifier qu'il ne contient que des placeholders.
 
 ---
 

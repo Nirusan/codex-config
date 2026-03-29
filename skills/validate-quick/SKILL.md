@@ -1,46 +1,52 @@
 ---
 name: validate-quick
-description: Quick validation check returning pass/fail. Use AUTOMATICALLY before any git commit, before pushing code, when user asks "is it ready?", "can we commit?", "does it build?", "c'est prêt?", "on peut commit?", "ça build?", or wants a quick health check. Runs silently in background.
+description: Quick validation check returning a compact pass/fail signal before commit, push, or a lightweight readiness claim. Runs the fastest meaningful checks available for the repo, preferring lint or type checks over heavier validation, and only falls back to broader checks when the repo lacks a lighter trustworthy gate.
 ---
 
 # Quick Validation Check
 
-Run available validation scripts and return a simple pass/fail result.
+Use this skill when you need a fast confidence signal, not a full QA pass.
+
+## Use when
+
+- before commit or push
+- when the user asks "is it ready?" and a quick signal is enough
+- when you want a lightweight preflight before deeper validation
+
+## Don't use when
+
+- the user wants full validation output
+- the claim depends on a specific repro path rather than generic project health
+- you already know the change needs deeper testing
 
 ## Process
 
-1. Check `package.json` for available scripts
-2. Run each available script silently
-3. Return summary only
+1. Inspect `package.json` or the repo tooling to find the fastest meaningful checks.
+2. Prefer this order:
+   - `pnpm lint`
+   - `pnpm typecheck`
+   - `pnpm build` only when no lighter structural check exists or build is the repo's real fast gate
+3. Run at most the minimum needed to produce a credible quick signal.
+4. Return compact pass/fail output only.
 
-## Scripts to Check
+## Output format
 
-Run in order, skip if not configured:
-- `pnpm lint`
-- `pnpm build`
-- `pnpm test:e2e` or `pnpm test`
-
-## Output Format
-
-**All pass:**
-```
-✅ Validation passed
+**All pass**
+```md
+✅ Quick validation passed
 - Lint: OK
-- Build: OK
-- Tests: OK
+- Typecheck: OK
 ```
 
-**Some fail:**
-```
-❌ Validation failed
-- Lint: OK
-- Build: FAILED
-- Tests: Skipped
+**Failure**
+```md
+❌ Quick validation failed
+- Lint: FAILED
+- Typecheck: Skipped
 ```
 
 ## Rules
 
-- No detailed error output (use `/validate` for that)
-- No offer to fix (use `/validate` for that)
-- Just run and report pass/fail
-- Fast and non-interactive
+- No long error dump; use `$validate` for detailed output.
+- Do not pretend this replaces task-specific verification.
+- If the repo's only meaningful gate is heavier, say so plainly.

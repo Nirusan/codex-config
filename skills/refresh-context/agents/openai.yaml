@@ -1,0 +1,7 @@
+interface:
+  display_name: "Refresh Context"
+  short_description: "Reload the project state quickly"
+  default_prompt: "Use $refresh-context to reload the important project docs and summarize the current state."
+
+policy:
+  allow_implicit_invocation: true

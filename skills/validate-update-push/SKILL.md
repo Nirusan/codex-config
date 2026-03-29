@@ -1,70 +1,50 @@
 ---
 name: validate-update-push
-description: Complete workflow to validate build, update documentation, update progress, and push changes. Use when finalizing work, before ending a session, or when the user says "finalize", "wrap up", or "ship it".
+description: Use when the user explicitly wants an end-of-task or end-of-session wrap-up that includes validation, documentation or progress sync if relevant, and git finalization. Runs the appropriate verification first, updates tracked docs only when needed, and commits or pushes only if that is part of the request.
 ---
 
-# Validate, Update & Push
+# Validate, Update, and Push
 
-Sequential workflow to validate, document, and push changes.
+Use this skill as a macro wrapper for careful finalization.
 
-## Step 1: Validate
+## Use when
 
-Run `/validate` to check available validations:
-- Lint (if configured)
-- Build (if configured)
-- Tests (if configured)
+- the user says "finalize", "wrap up", or "ship it"
+- the user wants a full end-of-task cleanup including validation and git
+- the branch should be left in a well-documented, validated state
 
-The validate skill automatically detects which scripts are available in `package.json` and skips those that aren't configured.
+## Don't use when
 
-**If validation fails:**
-1. Report the error clearly
-2. Ask: "Validation failed. Do you want me to fix this issue?"
-3. Wait for user response
-4. If user agrees, fix and re-run validation
-5. If user declines, stop the workflow
+- the user only wants a quick pass/fail check
+- the work is still in active implementation or debugging
+- the user does not want git finalization
 
-## Step 2: Update Documentation
+## Workflow
 
-Run `/update-docs` to update:
-- `AGENTS.md` (if meaningful changes exist)
-- `memory-bank/` files (except `brainstorm.md`)
+1. Run `$completion-verification` first to align proof with the actual claim.
+2. Run `$validate` or `$validate-quick` as appropriate for the task and repo.
+3. If the work changed reusable patterns or tracked project state, run:
+   - `$update-docs`
+   - `$update-progress`
+4. If the user wants git finalization, use `$git-add-commit-push`.
+5. Summarize what was:
+   - verified
+   - updated
+   - committed
+   - pushed
 
-If no updates needed, continue.
+## Rules
 
-## Step 3: Update Progress (Conditional)
-
-**Check if applicable:**
-- Search for implementation plan (in priority order):
-  1. `memory-bank/plan.md` or `memory-bank/*-implementation-plan.md`
-  2. `*-implementation-plan.md` or `implementation-plan.md` (project root)
-  3. `docs/*-implementation-plan.md`
-- If NO plan exists, skip this step
-
-**If plan exists:**
-- Determine if work relates to a task in the plan
-- If yes, run `/update-progress`
-- If unrelated, skip
-
-## Step 4: Git Add, Commit & Push
-
-Run `/git-add-commit-push` to:
-- Stage all changes
-- Create commit with appropriate message
-- Push to current branch
-
-## Error Handling
-
-At any step, if something unexpected happens:
-1. Explain what went wrong
-2. Ask the user how to proceed
-3. Never force through errors silently
+- Do not treat project validation alone as proof that a specific bug is fixed.
+- Do not update docs or progress when nothing meaningful changed.
+- Do not commit or push just because validation passed; that still depends on user intent.
+- If any validation fails, stop and report the failure before moving to docs or git.
 
 ## Output
 
-```
-## Summary
-- Validation: [Passed / Fixed N issues]
-- Documentation: [Updated X files / No updates needed]
-- Progress: [Updated / Skipped (no plan) / Skipped (unrelated work)]
-- Git: [Committed and pushed / Skipped]
-```
+Return a short structured wrap-up with:
+
+- verification performed
+- doc/progress updates made or skipped
+- git actions performed or skipped
+- anything still unverified

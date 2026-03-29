@@ -15,33 +15,98 @@ if [[ -f "$CODEX_DIR/AGENTS.md" ]]; then
   echo "    ✓ config/AGENTS.md"
 fi
 
-# Sync config.toml
+# Sync config template (public-safe, redacted)
 if [[ -f "$CODEX_DIR/config.toml" ]]; then
-  cp "$CODEX_DIR/config.toml" "$SCRIPT_DIR/config/config.toml"
-  echo "    ✓ config/config.toml"
+  python3 - "$CODEX_DIR/config.toml" "$SCRIPT_DIR/config/config.example.toml" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+src = Path(sys.argv[1])
+dest = Path(sys.argv[2])
+
+text = src.read_text()
+lines = []
+skip_project_block = False
+
+def redact_value(key: str, value: str) -> str:
+    key_lower = key.lower()
+    stripped = value.strip()
+
+    if key_lower in {"model", "model_reasoning_effort", "approval_policy", "sandbox_mode", "web_search", "personality"}:
+        return value
+
+    if key_lower in {"command"}:
+        return value
+
+    if key_lower in {"url"}:
+        if "project_ref=" in stripped:
+            return re.sub(r"project_ref=[^\"&]+", "project_ref=YOUR_PROJECT_REF", value)
+        return value
+
+    if key_lower in {"args"}:
+        if "/Users/" in stripped or "\\\\" in stripped:
+            return '["/path/to/your/local/tool"]'
+        return value
+
+    if any(token in key_lower for token in ("key", "token", "secret", "password", "authorization")):
+        indent = value[: len(value) - len(value.lstrip())]
+        return f'{indent}"YOUR_{key.upper()}_HERE"'
+
+    if key_lower.endswith("_url"):
+        indent = value[: len(value) - len(value.lstrip())]
+        return f'{indent}"https://your-service.example.com"'
+
+    if key_lower == "enabled":
+        return value
+
+    return value
+
+for line in text.splitlines():
+    stripped = line.strip()
+
+    if stripped.startswith('[projects."'):
+        skip_project_block = True
+        continue
+    if skip_project_block:
+        if stripped.startswith("[") and not stripped.startswith('[projects."'):
+            skip_project_block = False
+        else:
+            continue
+
+    if stripped.startswith("[mcp_servers.gemini-design-mcp]"):
+        lines.append(line)
+        continue
+
+    if stripped.startswith("[notice.model_migrations]"):
+        lines.append(line)
+        continue
+
+    if "=" in line and not stripped.startswith("#"):
+        key, value = line.split("=", 1)
+        redacted = redact_value(key.strip(), value)
+        lines.append(f"{key}= {redacted.lstrip()}")
+    else:
+        lines.append(line)
+
+dest.write_text("\n".join(lines).rstrip() + "\n")
+PY
+  echo "    ✓ config/config.example.toml"
 fi
 
-# Sync skills (all subdirectories)
+# Sync skills (preserve nested folders like agents/, scripts/, references/, assets/)
 if [[ -d "$CODEX_DIR/skills" ]]; then
+  mkdir -p "$SCRIPT_DIR/skills"
   for skill_dir in "$CODEX_DIR/skills"/*/; do
     if [[ -d "$skill_dir" ]]; then
       skill_name=$(basename "$skill_dir")
-      mkdir -p "$SCRIPT_DIR/skills/$skill_name"
-      if [[ -f "$skill_dir/SKILL.md" ]]; then
-        cp "$skill_dir/SKILL.md" "$SCRIPT_DIR/skills/$skill_name/SKILL.md"
-        echo "    ✓ skills/$skill_name/SKILL.md"
-      fi
-      for extra_file in "$skill_dir"*; do
-        if [[ -f "$extra_file" && "$(basename "$extra_file")" != "SKILL.md" ]]; then
-          cp "$extra_file" "$SCRIPT_DIR/skills/$skill_name/"
-          echo "    ✓ skills/$skill_name/$(basename "$extra_file")"
-        fi
-      done
-      if [[ -d "$skill_dir/scripts" ]]; then
-        mkdir -p "$SCRIPT_DIR/skills/$skill_name/scripts"
-        cp -r "$skill_dir/scripts/"* "$SCRIPT_DIR/skills/$skill_name/scripts/" 2>/dev/null || true
-        echo "    ✓ skills/$skill_name/scripts/"
-      fi
+      skill_src="${skill_dir%/}"
+      skill_dest="$SCRIPT_DIR/skills/$skill_name"
+      mkdir -p "$skill_dest"
+      rsync -a --delete \
+        --exclude '.DS_Store' \
+        "$skill_src/" "$skill_dest/"
+      echo "    ✓ skills/$skill_name/"
     fi
   done
 fi
@@ -54,4 +119,4 @@ echo "  cd $SCRIPT_DIR"
 echo "  git status"
 echo "  git add -A && git commit -m 'sync config' && git push"
 echo ""
-echo "Reminder: Review config.toml for any secrets before pushing."
+echo "Reminder: Review config/config.example.toml and make sure it contains placeholders only."

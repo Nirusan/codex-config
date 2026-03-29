@@ -1,0 +1,7 @@
+interface:
+  display_name: "Update Progress"
+  short_description: "Sync progress docs with completed work"
+  default_prompt: "Use $update-progress to sync the tracker with the work that was just completed."
+
+policy:
+  allow_implicit_invocation: true

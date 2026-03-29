@@ -1,0 +1,7 @@
+interface:
+  display_name: "Implement"
+  short_description: "Execute one scoped implementation slice"
+  default_prompt: "Use $implement to execute the next concrete chunk of work in this repo."
+
+policy:
+  allow_implicit_invocation: true

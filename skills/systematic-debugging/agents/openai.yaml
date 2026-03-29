@@ -1,0 +1,7 @@
+interface:
+  display_name: "Systematic Debugging"
+  short_description: "Debug by evidence before editing code"
+  default_prompt: "Use $systematic-debugging to find the root cause of this issue before proposing a fix."
+
+policy:
+  allow_implicit_invocation: true

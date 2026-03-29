@@ -93,7 +93,7 @@ mkdir -p "$CODEX_DIR/skills"
 
 # Detect if running from local clone or remote
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [[ -f "$SCRIPT_DIR/config/config.toml" ]]; then
+if [[ -f "$SCRIPT_DIR/config/config.example.toml" ]]; then
   echo "==> Installing from local clone..."
   LOCAL_INSTALL=true
 else
@@ -170,7 +170,7 @@ if [[ "$INSTALL_MODE" == "project" ]]; then
   if [[ -f "$CODEX_DIR/config.toml" ]]; then
     cp "$CODEX_DIR/config.toml" "$existing_config"
   fi
-  install_file "config/config.toml" "$CODEX_DIR/config.toml"
+  install_file "config/config.example.toml" "$CODEX_DIR/config.toml"
   if [[ -s "$existing_config" ]]; then
     merge_mcp_sections "$CODEX_DIR/config.toml" "$existing_config"
   fi
@@ -181,7 +181,7 @@ else
   if [[ -f "$CODEX_DIR/config.toml" ]]; then
     cp "$CODEX_DIR/config.toml" "$existing_config"
   fi
-  install_file "config/config.toml" "$CODEX_DIR/config.toml"
+  install_file "config/config.example.toml" "$CODEX_DIR/config.toml"
   if [[ -s "$existing_config" ]]; then
     merge_mcp_sections "$CODEX_DIR/config.toml" "$existing_config"
   fi
@@ -193,17 +193,23 @@ echo "==> Installing skills..."
 SKILLS=(
   "brainstorm"
   "db-check"
+  "design-director"
   "design-principles"
+  "completion-verification"
+  "frontend-skill"
   "git-add-commit-push"
   "humanizer"
   "implement"
   "implementation-plan"
   "next-task"
+  "playwright"
   "permissions-allow"
   "prd"
   "refresh-context"
+  "responsive-frontend-designs"
   "security-check"
   "seo-check"
+  "systematic-debugging"
   "sync-config"
   "tech-stack"
   "update-docs"
@@ -211,6 +217,8 @@ SKILLS=(
   "validate"
   "validate-quick"
   "validate-update-push"
+  "worktree-setup"
+  "browser-based-games"
 )
 for skill in "${SKILLS[@]}"; do
   install_skill "$skill"

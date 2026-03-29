@@ -1,0 +1,7 @@
+interface:
+  display_name: "Validate, Update, Push"
+  short_description: "Wrap up a task with careful finalization"
+  default_prompt: "Use $validate-update-push to validate this work, sync docs if needed, and finalize git only if appropriate."
+
+policy:
+  allow_implicit_invocation: false

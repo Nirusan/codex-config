@@ -1,0 +1,7 @@
+interface:
+  display_name: "Quick Validation"
+  short_description: "Run the fastest meaningful readiness check"
+  default_prompt: "Use $validate-quick for a quick pass or fail signal before committing or pushing."
+
+policy:
+  allow_implicit_invocation: true

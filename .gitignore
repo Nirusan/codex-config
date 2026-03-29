@@ -2,3 +2,4 @@
 .codex/
 .codex-backup-*
 .foo/
+config/config.toml

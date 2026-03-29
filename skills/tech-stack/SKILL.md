@@ -1,156 +1,108 @@
 ---
 name: tech-stack
-description: Define the technical stack and architecture for a project. Interactive session with the Architect agent.
+description: Use when the user wants to define or refine the technical stack and architecture for a product or feature. Produces a concrete architecture document that maps requirements to implementation choices, constraints, integrations, and risks. Do not use for product discovery, UI art direction, or direct feature implementation.
 ---
 
-# Tech Stack Skill
+# Tech Stack
 
-Interactive session to define the technical stack and key architecture decisions.
+Use this skill when the main question is architectural, not product or visual.
 
-## Usage
+## Use when
 
-```
-/tech-stack   # Creates memory-bank/tech-stack.md
-```
+- the user wants help choosing stack components
+- architecture tradeoffs need to be written down
+- the project needs an implementation-facing technical reference
+- a feature introduces meaningful new infra, security, or data concerns
 
-## Behavior
+## Don't use when
 
-1. **Spawn the Architect agent** to conduct the technical discussion
-2. Agent reads existing context (prd.md, brief.md) and analyzes requirements
-3. Agent asks about constraints, scale, team skills, integrations
-4. User and agent iterate until user says "generate", "finalize", or similar
-5. Create `memory-bank/tech-stack.md`
+- the main task is still product discovery
+- the answer should be a PRD rather than technical design
+- the user already knows the stack and wants implementation only
 
-## Instructions
+## Goal
 
-When this skill is invoked:
+Produce a practical architecture document that reflects real constraints and repo conventions.
 
-1. **Check for existing context**:
-   ```
-   Read memory-bank/brief.md if it exists
-   Read memory-bank/prd.md if it exists
-   Read AGENTS.md for user preferences (already includes stack preferences)
-   Read package.json if it exists (brownfield project)
-   ```
+## Workflow
 
-2. **Spawn the Architect agent**:
-   Use the Task tool with `subagent_type: "architect"` (custom agent).
+1. Read the relevant context:
+   - `AGENTS.md`
+   - product docs such as a brief or PRD
+   - `package.json` and the existing codebase if this is a brownfield project
+2. Determine whether the project is:
+   - greenfield
+   - brownfield with an existing stack to preserve
+3. Identify the real constraints:
+   - hosting
+   - cost
+   - performance
+   - auth/security
+   - data model
+   - team familiarity
+   - integrations
+4. Prefer compatibility with the existing repo when working in brownfield mode.
+5. Only present multiple options when the tradeoff is real.
+6. Produce a single recommended architecture with rationale.
 
-   Prompt for the agent:
-   ```
-   You are defining the technical stack for this project.
+## Output path
 
-   Existing context:
-   - Brief: {summary of brief.md if exists}
-   - PRD: {summary of prd.md if exists}
-   - User preferences from AGENTS.md: Next.js, Tailwind, shadcn/ui, Supabase, pnpm
-   - Existing package.json: {summary if exists - brownfield detection}
+Prefer this order:
 
-   Your goal:
-   1. Understand technical requirements from the PRD
-   2. Ask about constraints (hosting, budget, team, integrations)
-   3. Propose a stack that fits the requirements
-   4. Document key architecture decisions (ADRs)
-   5. When ready, create memory-bank/tech-stack.md
+1. `memory-bank/tech-stack.md` if `memory-bank/` exists
+2. `docs/tech-stack.md`
 
-   If this is a brownfield project (package.json exists), focus on matching existing patterns.
+## Suggested structure
 
-   Start by summarizing the technical needs you see from the PRD, then ask about any constraints.
-
-   User's initial input: {user's message if any}
-   ```
-
-3. **Let the agent run** the interactive session
-
-4. **Output**: `memory-bank/tech-stack.md`
-
-## Output Location
-
-```
-memory-bank/
-└── tech-stack.md
-```
-
-## Tech Stack Template
-
-The agent should create a document following this structure:
-
-```markdown
+```md
 # Tech Stack
 
 ## Overview
-{One paragraph rationale for the overall approach}
+{One-paragraph rationale}
+
+## Product shape
+{Greenfield or brownfield, main assumptions}
 
 ## Frontend
 | Layer | Choice | Rationale |
 |-------|--------|-----------|
-| Framework | Next.js 14+ | App Router, RSC, Server Actions |
-| Styling | Tailwind CSS + shadcn/ui | Rapid development, consistent design |
-| State | Zustand | Simple, performant global state |
-| Forms | React Hook Form + Zod | Type-safe validation |
 
 ## Backend
 | Layer | Choice | Rationale |
 |-------|--------|-----------|
-| API | Next.js Server Actions | Colocation, type safety |
-| Database | Supabase (PostgreSQL) | Auth + DB + Realtime + Storage |
-| Auth | Supabase Auth | Built-in, secure, multiple providers |
-| Storage | Supabase Storage | Integrated with auth |
+
+## Data and integrations
+- {database}
+- {storage}
+- {queues, cache, webhooks, realtime, etc.}
 
 ## Infrastructure
 | Layer | Choice | Rationale |
 |-------|--------|-----------|
-| Hosting | Vercel | Native Next.js support |
-| CI/CD | GitHub Actions | Standard, integrated |
-| Monitoring | Vercel Analytics | Built-in |
 
-## Key Libraries
-| Purpose | Library | Version |
-|---------|---------|---------|
-| Icons | lucide-react | latest |
-| Date handling | date-fns | latest |
-| {purpose} | {library} | {version} |
+## Security and permissions
+- {auth approach}
+- {authorization approach}
+- {sensitive boundaries}
 
-## Architecture Decisions
+## Architecture decisions
+### ADR-1: {Decision}
+- Context:
+- Decision:
+- Alternatives considered:
+- Consequences:
 
-### ADR-1: {Decision Title}
-- **Context**: {Why this decision was needed}
-- **Decision**: {What we decided}
-- **Alternatives considered**: {What else we looked at}
-- **Consequences**: {Trade-offs we're accepting}
-
-### ADR-2: {Decision Title}
-{Same format}
-
-## Data Model (High-Level)
-
-### Core Entities
-- **{Entity}**: {description, key fields}
-- **{Entity}**: {description, key fields}
-
-### Relationships
-- {Entity A} → {Entity B}: {relationship type, description}
-
-## Security Considerations
-- Authentication: {approach}
-- Authorization: {RLS, middleware, etc.}
-- Data validation: {where and how}
-
-## Performance Considerations
-- Caching strategy: {approach}
-- Image optimization: {approach}
-- Bundle size: {considerations}
+## Risks and follow-ups
+- {risk}
 ```
 
-## Default Stack (from user preferences)
+## Writing rules
 
-When no specific requirements contradict, default to:
-- **Frontend**: Next.js 14+, Tailwind, shadcn/ui, Zustand
-- **Backend**: Supabase (PostgreSQL, Auth, Storage)
-- **Hosting**: Vercel
-- **Package Manager**: pnpm
+- Reflect the existing repo before proposing new tools.
+- Avoid stack tourism: every choice should have a reason.
+- Distinguish hard requirements from defaults and preferences.
+- Call out risky assumptions explicitly.
 
-## Next Step
+## Suggested next step
 
-After creating the tech-stack, suggest:
-> "Tech stack saved to `memory-bank/tech-stack.md`. Run `/implementation-plan` to create the development plan."
+Once the stack is clear, the next step is usually `$implementation-plan`.

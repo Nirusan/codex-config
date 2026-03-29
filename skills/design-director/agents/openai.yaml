@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Director"
+  short_description: "Steer AI frontend work with clearer art direction"
+  default_prompt: "Help me define a stronger frontend design direction, write anti-goals, and produce a reusable brief before generating UI code."

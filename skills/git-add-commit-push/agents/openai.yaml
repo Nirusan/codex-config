@@ -1,0 +1,7 @@
+interface:
+  display_name: "Commit and Push"
+  short_description: "Finalize git state deliberately and safely"
+  default_prompt: "Use $git-add-commit-push to commit the intended changes and push only if requested."
+
+policy:
+  allow_implicit_invocation: false

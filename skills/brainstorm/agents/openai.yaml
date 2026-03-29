@@ -1,0 +1,7 @@
+interface:
+  display_name: "Brainstorm"
+  short_description: "Turn a vague idea into a usable brief"
+  default_prompt: "Use $brainstorm to turn this product idea into a clear brief before we plan or build."
+
+policy:
+  allow_implicit_invocation: true

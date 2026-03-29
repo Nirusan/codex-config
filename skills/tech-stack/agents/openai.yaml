@@ -1,0 +1,7 @@
+interface:
+  display_name: "Tech Stack"
+  short_description: "Define the right architecture for the work"
+  default_prompt: "Use $tech-stack to define the architecture and technical choices for this project."
+
+policy:
+  allow_implicit_invocation: true

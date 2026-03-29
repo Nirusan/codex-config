@@ -1,162 +1,106 @@
 ---
 name: prd
-description: Create a Product Requirements Document. Interactive session to define features, requirements, and scope.
+description: Use when the user wants to turn a product idea or feature brief into concrete requirements. Produces a Product Requirements Document with scope, user stories, acceptance criteria, priorities, constraints, and open questions. Do not use for architecture design, debugging, or implementation execution.
 ---
 
-# PRD Skill
+# Product Requirements Document
 
-Interactive session to create a Product Requirements Document.
+Use this skill when the user wants real requirements, not just ideation.
 
-## Usage
+## Use when
 
-```
-/prd                      # Main project PRD → memory-bank/prd.md
-/prd --feature=dark-mode  # Feature PRD → memory-bank/features/dark-mode/prd.md
-```
+- the problem and solution are directionally known
+- the user wants to define MVP scope
+- you need user stories and acceptance criteria before implementation
+- a feature needs its own requirements document
 
-## Behavior
+## Don't use when
 
-1. **Determine output location** based on `--feature` parameter
-2. **Spawn the Product Manager agent** to conduct the requirements session
-3. Agent reads existing context (brief.md) and asks clarifying questions
-4. User and agent iterate until user says "generate", "create the prd", or similar
-5. Create the PRD at the appropriate location
+- the idea is still too vague and needs discovery first
+- the main need is technical architecture
+- the task is already implementation-ready and only needs a build plan
 
-## Instructions
+## Goal
 
-When this skill is invoked:
+Write a PRD that is specific enough to guide architecture and implementation without pretending every detail is settled.
 
-1. **Parse arguments**:
-   - If `--feature=X` provided, set `feature_name = X`
-   - Otherwise, `feature_name = null` (main project PRD)
+## Workflow
 
-2. **Determine paths**:
-   ```
-   If feature_name:
-     output_dir = memory-bank/features/{feature_name}/
-     output_file = memory-bank/features/{feature_name}/prd.md
-   Else:
-     output_dir = memory-bank/
-     output_file = memory-bank/prd.md
-   ```
+1. Read relevant context if it exists:
+   - `AGENTS.md`
+   - a brief (`memory-bank/brief.md`, `docs/brief.md`, or equivalent)
+   - an existing PRD if you are refining rather than starting fresh
+   - existing product docs that define constraints or terminology
+2. Confirm whether the PRD is:
+   - for the main product
+   - for a specific feature
+3. Resolve the output path by following the repo's existing documentation structure.
+4. Ask targeted clarification questions only when they materially change scope or requirements.
+5. Produce the PRD with explicit non-goals and acceptance criteria.
 
-3. **Check for existing context**:
-   ```
-   Read memory-bank/brief.md if it exists
-   Read memory-bank/prd.md if it exists (for feature PRDs, understand main product)
-   Read memory-bank/tech-stack.md if it exists
-   Read AGENTS.md if it exists
-   ```
+## Output path
 
-4. **Create output directory** if needed:
-   ```bash
-   mkdir -p {output_dir}
-   ```
+Prefer this order:
 
-5. **Spawn the Product Manager agent**:
-   Use the Task tool with `subagent_type: "product-manager"` (custom agent).
+1. `memory-bank/features/<feature-name>/prd.md` for feature-specific work when that structure already exists
+2. `memory-bank/prd.md` for a main product PRD when `memory-bank/` exists
+3. `docs/features/<feature-name>/prd.md` if the repo uses `docs/` instead
+4. `docs/prd.md` otherwise
 
-   Prompt for the agent:
-   ```
-   You are creating a PRD for: {feature_name or "the main product"}
+## PRD structure
 
-   Existing context:
-   - Brief: {summary of brief.md if exists}
-   - Main PRD: {summary if feature PRD and main prd.md exists}
-   - Tech Stack: {summary if exists}
-
-   Your goal:
-   1. Understand the scope (MVP vs future)
-   2. Define user stories with acceptance criteria
-   3. Document functional and non-functional requirements
-   4. Prioritize using MoSCoW
-   5. When ready, create {output_file}
-
-   Start by confirming your understanding of what we're building, then ask about the main user flows.
-
-   User's initial input: {user's message if any}
-   ```
-
-6. **Let the agent run** the interactive session
-
-7. **Output**: PRD file at determined location
-
-## Output Location
-
-```
-# Main project
-memory-bank/
-└── prd.md
-
-# Feature-specific
-memory-bank/
-└── features/
-    └── {feature-name}/
-        └── prd.md
-```
-
-## PRD Template
-
-The agent should create a PRD following this structure:
-
-```markdown
-# PRD: {Feature/Product Name}
+```md
+# PRD: {Name}
 
 ## Overview
-{One paragraph summary}
+{One-paragraph summary}
 
 ## Goals
 - Primary: {main objective}
-- Secondary: {supporting objectives}
+- Secondary: {supporting objective}
 
-## Non-Goals (Out of Scope)
-- {Explicit exclusions}
+## Non-Goals
+- {explicitly out of scope}
 
-## User Stories
+## Target Users
+- {user type}: {context and need}
 
-### Core User Flows
-1. **{Flow Name}**
-   - As a {user}, I want to {action} so that {benefit}
+## Core User Stories
+1. As a {user}, I want to {action} so that {benefit}
    - Acceptance Criteria:
-     - [ ] {criterion 1}
-     - [ ] {criterion 2}
-
-### Secondary Flows
-{Same format}
+     - [ ] {criterion}
+     - [ ] {criterion}
 
 ## Functional Requirements
-
-### {Feature Area 1}
 | ID | Requirement | Priority | Notes |
 |----|-------------|----------|-------|
 | FR-1 | {requirement} | Must | {notes} |
-| FR-2 | {requirement} | Should | {notes} |
 
 ## Non-Functional Requirements
-
 | Category | Requirement | Target |
 |----------|-------------|--------|
-| Performance | Page load time | < 2s |
-| Security | Authentication | {method} |
+| Performance | {requirement} | {target} |
 
 ## Dependencies
-- {External services, other features}
+- {external system, internal prerequisite, or assumption}
 
-## Risks & Mitigations
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| {risk} | H/M/L | {mitigation} |
+## Risks and Open Questions
+- {risk or unresolved point}
 
 ## Success Metrics
-- {Metric}: {target}
-
-## Open Questions
-- {Questions for tech team}
+- {metric}: {target}
 ```
 
-## Next Step
+## Writing rules
 
-After creating the PRD, suggest:
-> "PRD saved to `{output_file}`. Next:
-> - `/tech-stack` to define the technical stack
-> - Or `/implementation-plan` if stack is already decided"
+- Prefer testable requirements over aspirational language.
+- Separate must-have behavior from future ideas.
+- If something is unknown, put it in open questions rather than faking precision.
+- Reuse real product labels and terminology when they already exist.
+
+## Suggested next step
+
+Once the PRD is solid, the next steps are usually:
+
+- `$tech-stack`
+- `$implementation-plan`

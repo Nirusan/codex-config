@@ -1,0 +1,7 @@
+interface:
+  display_name: "Implementation Plan"
+  short_description: "Break work into sequenced stories"
+  default_prompt: "Use $implementation-plan to break this work into implementation stories and a progress tracker."
+
+policy:
+  allow_implicit_invocation: true

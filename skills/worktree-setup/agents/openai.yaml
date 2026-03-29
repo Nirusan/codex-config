@@ -1,0 +1,7 @@
+interface:
+  display_name: "Worktree Setup"
+  short_description: "Create a clean isolated coding workspace"
+  default_prompt: "Use $worktree-setup to create a safe isolated workspace for this task before implementation."
+
+policy:
+  allow_implicit_invocation: true

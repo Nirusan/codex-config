@@ -1,58 +1,60 @@
 ---
 name: refresh-context
-description: Re-read project documentation (AGENTS.md, progress.txt, memory-bank/) to refresh context. Use when starting a new session, after a break, or when the user says "refresh", "reload context", "what's the current state", or "on en est où".
+description: Re-read the project's key docs to recover working context at the start of a session, after a break, or when the user asks for the current state. Reads AGENTS, planning docs, progress, and other high-signal project files, then summarizes the active constraints, current status, and likely next move.
 ---
 
-# Refresh Project Context
+# Refresh Context
 
-Re-read all key documentation files to understand the project.
+Use this skill to rebuild working context without rereading the entire repo blindly.
 
-## Files to Read (in order)
+## Use when
 
-1. **AGENTS.md** (project root)
-   - Code conventions
-   - Tech stack
-   - Rules to follow
+- starting a new session in an existing project
+- resuming after a break
+- the user asks "where are we?", "what's the current state?", or equivalent
 
-2. **memory-bank/** (if present, exclude brainstorm.md)
-   - `prd.md` / `PRD.md` - Product Requirements
-   - `tech-stack.md` - Detailed stack
-   - `design-system.md` - UI/UX guidelines
-   - `plan.md` - Implementation plan
+## Workflow
 
-3. **Implementation plan** (fallback search in priority order if not in memory-bank/)
-   1. `memory-bank/*-implementation-plan.md` or `memory-bank/implementation-plan.md`
-   2. `*-implementation-plan.md` or `implementation-plan.md` (project root)
-   3. `docs/*-implementation-plan.md` or `docs/implementation-plan.md`
-   4. First `**/*implementation-plan*.md` found elsewhere
+1. Read `AGENTS.md` first if present.
+2. Read the highest-signal project docs next, typically:
+   - brief / PRD / tech-stack
+   - plan / progress
+   - design-system if relevant
+   - schema or other key technical docs only when they matter
+3. Prefer the repo's real planning structure:
+   - `memory-bank/`
+   - or `docs/`
+   - or root planning docs if that is what the repo uses
+4. Ignore low-signal or stale brainstorming debris unless it is still actively relevant.
+5. Summarize:
+   - stack and conventions
+   - current work status
+   - important open risks or constraints
+   - likely next action
 
-4. **Progress file** (fallback search in priority order)
-   1. `progress.txt`, `progress.md`, `PROGRESS.md` (project root)
-   2. `memory-bank/progress.txt`, `memory-bank/progress.md`
+## Good summary structure
 
-5. **database/schema.sql** (if present)
-   - Database structure
-
-## Files to Ignore
-
-- `brainstorm.md` - Research/ideation, not relevant for implementation
-- `node_modules/`
-- `.next/`
-
-## Summary Output
-
-After reading, display:
-```
+```md
 ## Context Loaded
 
-**Project:** [Name]
-**Stack:** [Next.js, Supabase, etc.]
-**Current phase:** [Phase X - Name]
+**Project**
+- {name or repo}
 
-**Key conventions:**
-- [Convention 1]
-- [Convention 2]
+**Key conventions**
+- {important rule}
 
-**Suggested next action:**
-[What seems to be the logical next step]
+**Current status**
+- {where work stands}
+
+**Open constraints**
+- {important blocker, assumption, or risk}
+
+**Suggested next step**
+- {next likely move}
 ```
+
+## Rules
+
+- Read selectively, not exhaustively.
+- Prefer current implementation docs over old brainstorm notes.
+- If there are conflicting docs, call that out instead of flattening the disagreement.

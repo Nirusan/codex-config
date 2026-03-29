@@ -1,135 +1,64 @@
 ---
 name: next-task
-description: Identify the next incomplete task from the implementation plan. Use when the user asks "what's next", "next task", "c'est quoi la suite", or wants to know what to work on next.
+description: Use when the user asks what to work on next, wants the next incomplete story from a plan, or needs a concise status-based recommendation. Reads the current plan and progress tracker, identifies the next actionable item, and explains any blockers or missing prerequisites. Do not use when no plan exists and the user actually needs planning first.
 ---
 
-# Identify Next Task
+# Next Task
 
-## Step 0: Determine Context
+Use this skill to answer "what should we do next?" from actual project state.
 
-1. **Check for --feature parameter**:
-   - If `--feature=X` provided, set `feature_name = X`
-   - Otherwise, check if `memory-bank/features/` exists
+## Use when
 
-2. **If features exist and no param specified**:
-   - List available features
-   - Ask: "Which feature? (or 'main' for the main project, or 'all' to see overview)"
+- the user asks for the next task
+- a plan exists and the next unfinished story should be identified
+- the user wants a quick status-based recommendation
 
-3. **Set paths based on context**:
-   ```
-   If feature_name and feature_name != 'main':
-     plan_file = memory-bank/features/{feature_name}/plan.md
-     progress_file = memory-bank/features/{feature_name}/progress.md
-   Else:
-     plan_file = memory-bank/plan.md (or *-implementation-plan.md)
-     progress_file = memory-bank/progress.md (or progress.txt)
-   ```
+## Don't use when
 
-## Step 1: Read Plan
+- there is no plan or tracking doc and the user really needs one
+- the task is brainstorming rather than execution sequencing
 
-Find and read the implementation plan file at `{plan_file}`.
+## Workflow
 
-Fallback search (in priority order):
-1. `memory-bank/*-implementation-plan.md` or `memory-bank/implementation-plan.md`
-2. `*-implementation-plan.md` or `implementation-plan.md` (project root)
-3. `docs/*-implementation-plan.md` or `docs/implementation-plan.md`
-4. First `**/*implementation-plan*.md` found elsewhere
+1. Read the best available plan and progress files.
+2. Follow the repo's existing planning structure rather than inventing a new one.
+3. Compare:
+   - remaining stories
+   - current story
+   - explicit blockers or dependencies
+4. Identify the next actionable task, not just the first unchecked line.
+5. If no plan exists, say so and recommend the appropriate planning step instead.
 
-**If multiple matches**: Ask the user which file to use.
+## Path resolution
 
-## Step 2: Read Progress
+Prefer this order:
 
-Find and read the progress tracking file at `{progress_file}`.
+1. feature-level `memory-bank/features/<feature>/plan.md` + `progress.md` when clearly in scope
+2. `memory-bank/plan.md` + `memory-bank/progress.md`
+3. `docs/implementation-plan.md` + `docs/progress.md`
+4. the closest equivalent tracked docs already used by the repo
 
-Fallback search (in priority order):
-1. `progress.txt`, `progress.md`, `PROGRESS.md` (project root)
-2. `memory-bank/progress.txt`, `memory-bank/progress.md`
+## Output format
 
-## Step 3: Analyze
+Return a concise status block with:
 
-Compare the plan with progress to identify:
-1. The **current phase** (e.g., Phase 2 - Core Features)
-2. **Completed stories** in this phase
-3. The **next story** to work on
-4. Any **blockers or dependencies**
+- current phase or area if known
+- what is already done
+- the next story or task
+- why that is the next task
+- any blocker or prerequisite
 
-## Step 4: Display Result
+## If everything is done
 
-Output format:
-```
-## Progress: {feature_name or 'Main Project'}
+Say so clearly and recommend the next sensible move, such as:
 
-**Current phase**: {Phase name}
-**Completed**: {X}/{Y} stories
+- validation
+- documentation cleanup
+- a new feature plan
 
----
+## If the plan is unclear
 
-## Next Story
+Do not guess too hard. State the ambiguity and suggest:
 
-### Story {N}: {Title}
-
-**Goal**: {What this achieves}
-
-**Tasks**:
-- [ ] {task 1}
-- [ ] {task 2}
-
-**Files likely to change**:
-- `path/to/file1.ts`
-- `path/to/file2.ts`
-
-**Dependencies**: {Any prerequisites}
-
----
-
-Run `/implement --feature={name}` to start working on this story.
-```
-
-## Step 5: Handle Completion
-
-If all stories are complete:
-```
-## {feature_name or 'Main Project'} Complete!
-
-All {N} stories have been implemented.
-
-**Completed**:
-- [x] Story 1: {title}
-- [x] Story 2: {title}
-...
-
-**Next steps**:
-- Run `/validate` for final checks
-- Consider creating a new feature with `/prd --feature=new-feature`
-```
-
-## Feature Flag Examples
-
-```bash
-/next-task                          # Asks which feature or uses main
-/next-task --feature=dark-mode      # Shows next task for dark-mode
-/next-task --feature=main           # Shows next task for main project
-/next-task --feature=all            # Shows overview of all features
-```
-
-## Overview Mode (--feature=all)
-
-When `--feature=all`:
-```
-## Project Overview
-
-### Main Project
-- Status: {X}/{Y} stories complete
-- Next: Story {N} - {title}
-
-### Feature: dark-mode
-- Status: {X}/{Y} stories complete
-- Next: Story {N} - {title}
-
-### Feature: user-auth
-- Status: Complete!
-
----
-
-Run `/next-task --feature=X` for details on a specific feature.
-```
+- `$implementation-plan`
+- or a direct clarification question if that is the shortest path

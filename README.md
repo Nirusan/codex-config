@@ -73,7 +73,8 @@ cp -rP ~/.codex-backup-YYYYMMDD-HHMMSS/* ~/.codex/
 
 ### Codex Config
 
-- `config/config.toml` → installed to `~/.codex/config.toml` (or `./.codex/config.toml`)
+- `config/config.example.toml` → installed to `~/.codex/config.toml` (or `./.codex/config.toml`)
+- Public-safe template only: no real API keys or personal project paths are stored in this repo
 - Model defaults, approvals, sandbox mode, web search
 - MCP server templates (OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, Chrome DevTools, Gemini Design, n8n)
 
@@ -114,6 +115,8 @@ cd /path/to/codex-config
 ./sync.sh
 ```
 
+`./sync.sh` updates `config/config.example.toml`, not your real local `config.toml`. Review the generated template before committing to make sure it only contains placeholders.
+
 ## File Structure
 
 ```
@@ -124,7 +127,7 @@ codex-config/
 ├── sync.sh
 ├── config/
 │   ├── AGENTS.md
-│   └── config.toml
+│   └── config.example.toml
 └── skills/
     ├── brainstorm/SKILL.md
     ├── prd/SKILL.md

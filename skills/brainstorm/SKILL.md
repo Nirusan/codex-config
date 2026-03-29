@@ -1,95 +1,96 @@
 ---
 name: brainstorm
-description: Explore and validate product ideas through structured brainstorming. Creates a product brief.
+description: Use when the user wants to explore or sharpen a product idea before writing requirements or code. Helps turn a vague concept into a concrete brief by clarifying the problem, target users, alternatives, differentiators, success criteria, and open questions. Do not use for implementation, debugging, or finalized requirements work.
 ---
 
-# Brainstorm Skill
+# Brainstorm
 
-Interactive ideation and product discovery session. Outputs a structured product brief.
+Use this skill for product discovery before PRDs or implementation plans.
 
-## Behavior
+## Use when
 
-1. **Spawn the Analyst agent** to conduct the brainstorming session
-2. Agent asks targeted questions about the problem, users, and opportunity
-3. User and agent iterate until user says "generate", "create the brief", or similar
-4. Create `memory-bank/brief.md`
+- the idea is still fuzzy
+- the user wants to explore options before committing
+- the problem, user, or differentiator is not fully clear yet
+- you need a short written brief that future planning can build on
 
-## Instructions
+## Don't use when
 
-When this skill is invoked:
+- the user already has concrete requirements and wants a PRD
+- the task is implementation or debugging
+- the request is only to rewrite existing docs without discovery
 
-1. **Check for existing context**:
-   ```
-   Read memory-bank/brief.md if it exists
-   Read memory-bank/prd.md if it exists
-   Read AGENTS.md if it exists
-   ```
+## Goal
 
-2. **Spawn the Analyst agent**:
-   Use the Task tool with `subagent_type: "analyst"` (custom agent).
+Turn a rough concept into a brief that is specific enough for the next planning step.
 
-   Prompt for the agent:
-   ```
-   You are conducting a brainstorming session to help the user explore and validate their product idea.
+## Workflow
 
-   Context found: {summarize any existing docs}
+1. Read the local context if it exists:
+   - `AGENTS.md`
+   - `memory-bank/brief.md`, `memory-bank/prd.md`
+   - or equivalent files in `docs/` or the repo root
+2. Summarize the current understanding in plain language.
+3. Ask only the highest-value questions needed to remove ambiguity. Prioritize:
+   - the problem
+   - the user
+   - current alternatives
+   - why this deserves to exist
+   - what success looks like
+4. When the user already gave enough information, synthesize instead of over-questioning.
+5. Produce or update a concise brief.
 
-   Your goal:
-   1. Understand the problem they're trying to solve
-   2. Identify who has this problem
-   3. Explore existing solutions and gaps
-   4. Help them articulate a clear value proposition
-   5. When they're ready, create memory-bank/brief.md
+## Output path
 
-   Start by asking about the problem they want to solve. Be proactive but collaborative.
+Prefer this order:
 
-   User's initial input: {user's message if any}
-   ```
+1. `memory-bank/brief.md` if `memory-bank/` exists
+2. `docs/brief.md` if `docs/` exists
+3. `brief.md` at the repo root only if the project has no better documentation home
 
-3. **Let the agent run** the interactive session
+## Brief structure
 
-4. **Output**: `memory-bank/brief.md`
+Use this structure unless the repo already has an established template:
 
-## Output Location
-
-```
-memory-bank/
-└── brief.md
-```
-
-## Brief Template
-
-The agent should create a brief following this structure:
-
-```markdown
+```md
 # Product Brief: {Name}
 
 ## Problem Statement
-{Clear, concise description of the problem}
+{What is broken or missing today?}
 
 ## Target User
-{Who they are, their context, their pain}
+{Who has the problem and in what context?}
 
 ## Current Alternatives
-{What exists today and why it falls short}
+{What they do today and why it is insufficient}
 
 ## Proposed Solution
-{High-level concept, not implementation details}
+{High-level product concept}
 
 ## Key Differentiator
-{The one thing that makes this worth building}
+{Why this is worth building}
 
 ## Success Criteria
-{How we'll know if this works}
+{How we will know this is working}
 
 ## Open Questions
-{Things to resolve in PRD phase}
+{What still needs to be decided}
 
 ## Out of Scope
-{What this is NOT trying to solve}
+{What this brief is not trying to solve}
 ```
 
-## Next Step
+## Output style
 
-After creating the brief, suggest:
-> "Brief saved to `memory-bank/brief.md`. When ready to define requirements, run `/prd`."
+- Be concrete, not visionary for its own sake.
+- Prefer specific tradeoffs over broad ambition.
+- Keep the brief short enough to read quickly.
+
+## Suggested next step
+
+After the brief is solid, the natural next steps are usually:
+
+- `$prd`
+- `$tech-stack`
+
+depending on whether the user wants requirements first or architecture first.

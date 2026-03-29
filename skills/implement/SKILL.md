@@ -1,121 +1,77 @@
 ---
 name: implement
-description: Complete implementation workflow for a task - understand context, plan, implement, validate, review, and commit. Use when the user wants to implement a feature, fix a bug, or complete a specific development task.
+description: Use when the user wants to implement a concrete feature, fix a bug, or execute the next planned chunk of work. Reads the relevant local context, chooses the next actionable unit when a plan exists, implements carefully, validates the result, and updates related docs or progress when appropriate. Do not use for vague ideation or for end-of-session git finalization alone.
 ---
 
-# Implement a Task
+# Implement
 
-## Phase 0: Determine Context
+Use this skill when it is time to actually change code.
 
-1. **Check for --feature parameter**:
-   - If `--feature=X` provided, set `feature_name = X`
-   - Otherwise, check if `memory-bank/features/` exists and has subdirectories
-   - If features exist and no param, ask: "Which feature are you working on? (or 'main' for the main project)"
+## Use when
 
-2. **Set paths based on context**:
-   ```
-   If feature_name and feature_name != 'main':
-     plan_file = memory-bank/features/{feature_name}/plan.md
-     progress_file = memory-bank/features/{feature_name}/progress.md
-     prd_file = memory-bank/features/{feature_name}/prd.md
-   Else:
-     plan_file = memory-bank/plan.md
-     progress_file = memory-bank/progress.md (or progress.txt)
-     prd_file = memory-bank/prd.md
-   ```
+- the user wants a feature implemented
+- the user wants a bug fixed
+- a plan already exists and the next story should be executed
+- the work is concrete enough to act on now
 
-3. **Fallback search** (if main project files not found, in priority order):
-   - Plan:
-     1. `memory-bank/*-implementation-plan.md` or `memory-bank/implementation-plan.md`
-     2. `*-implementation-plan.md` or `implementation-plan.md` (project root)
-     3. `docs/*-implementation-plan.md` or `docs/implementation-plan.md`
-     4. First `**/*implementation-plan*.md` found elsewhere
-   - Progress: `progress.txt`, `progress.md`, `PROGRESS.md` (project root first, then memory-bank/)
-   - PRD: `memory-bank/prd.md`, `memory-bank/PRD.md`, `prd.md`, `PRD.md`
+## Don't use when
 
-   **If multiple matches**: Ask the user which file to use.
+- the idea is still vague and needs product discovery
+- the main task is architecture planning
+- the user only wants to commit, push, or clean up git state
 
-## Phase 1: Understand
+## Goal
 
-1. Read `AGENTS.md` for conventions
-2. Read `memory-bank/tech-stack.md` for technical context
-3. Read `{plan_file}` for the implementation plan
-4. Read `{progress_file}` for current status
-5. Identify the **next incomplete story** from the plan
-6. Use **TodoWrite** to plan subtasks for this story
-7. If task touches DB, read `database/schema.sql` or check Supabase schema
+Deliver one meaningful chunk of implementation end to end: understand, build, validate, and leave the project clearer than before.
 
-## Phase 2: Implement
+## Workflow
 
-1. Implement the current story (one story at a time!)
-2. Follow AGENTS.md conventions:
-   - Functional/declarative, no classes
-   - Minimize 'use client'
-   - No barrel imports (import directly)
-   - Promise.all for parallel fetches
-   - Naming: kebab-case (folders), PascalCase (components), camelCase (functions)
-3. Mark todos as completed as you go
-4. If you need library documentation, use Context7
-
-## Phase 2.5: Tests (if relevant)
-
-If the story adds new user-facing functionality:
-1. Create/update tests in `tests/` or alongside components
-2. Follow existing patterns
-3. Use data-testid attributes for E2E selectors
-
-**Skip if:**
-- Minor fix (typo, style, refactor)
-- Internal change with no UI impact
-- Existing tests already cover the case
-
-## Phase 3: Validate
-
-Run in order (stop on failure):
-```bash
-pnpm lint
-pnpm build
-pnpm test:e2e  # if E2E tests exist
-```
-
-If DB changes, check Supabase advisors (security/RLS)
-
-## Phase 4: Code Review
-
-Invoke `/security-check` skill to analyze changes.
-Fix any critical issues identified.
-
-## Phase 5: Update Progress
-
-Update `{progress_file}`:
-- Mark the completed story as done
-- Move it from "Remaining" to "Completed"
-- Update "Current Story" to the next one (or "None" if done)
-
-## Phase 6: Commit
-
-Commit with a descriptive message:
-```bash
-git add .
-git commit -m "feat: [story description]
-
-Story: #{story_number} from {feature_name or 'main'} plan
-
-Co-Authored-By: Codex <noreply@anthropic.com>"
-```
+1. Read the local rules first:
+   - `AGENTS.md`
+   - relevant repo docs
+   - the best available planning docs if they exist
+2. Determine the work unit:
+   - if a plan exists, identify the next relevant story or task
+   - otherwise derive a small implementation slice from the user's request
+3. If isolation would materially help, use `$worktree-setup` before making changes.
+4. Make a short execution plan before editing.
+5. Implement the smallest coherent slice that moves the task forward.
+6. If the work gets blocked by unclear failures, switch to `$systematic-debugging`.
+7. Validate the result with the lightest credible checks for the change.
+8. If the change establishes a reusable pattern or updates tracked work, use:
+   - `$update-docs`
+   - `$update-progress`
+9. Before claiming readiness, use `$completion-verification`.
 
 ## Rules
 
-- **ONE story per execution** - complete it fully before moving on
-- **ALL validations must pass** before commit
-- **Update progress immediately** after completing a story
-- Never auto-post (human-in-the-loop)
-- Use pnpm, not npm
+- Prefer one coherent slice over many half-finished edits.
+- Do not auto-commit or auto-push unless the user explicitly asks for git finalization.
+- Keep the repo's patterns and conventions stronger than your personal preferences.
+- Be explicit about assumptions when planning docs are missing or incomplete.
+- If the user asked for a small fix, do not balloon it into a refactor unless necessary.
 
-## Feature Flag Examples
+## Validation guidance
 
-```bash
-/implement                          # Asks which feature or uses main
-/implement --feature=dark-mode      # Works on dark-mode feature
-/implement --feature=main           # Explicitly works on main project
-```
+Choose the right level for the task:
+
+- `$validate-quick` for a fast signal
+- `$validate` for fuller project validation
+- `$security-check` when the change touches auth, permissions, secrets, or sensitive data
+- `$db-check` after schema, migration, or RLS changes
+
+## Output expectations
+
+After using this skill, you should be able to state:
+
+- what was implemented
+- what was validated
+- what remains open
+- whether docs or progress were updated
+
+## Suggested companion skills
+
+- `$next-task`
+- `$worktree-setup`
+- `$systematic-debugging`
+- `$completion-verification`

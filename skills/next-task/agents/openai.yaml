@@ -1,0 +1,7 @@
+interface:
+  display_name: "Next Task"
+  short_description: "Find the next actionable item"
+  default_prompt: "Use $next-task to tell me what we should work on next from the current plan."
+
+policy:
+  allow_implicit_invocation: true

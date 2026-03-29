@@ -1,0 +1,7 @@
+interface:
+  display_name: "PRD"
+  short_description: "Write concrete product requirements"
+  default_prompt: "Use $prd to turn this feature idea into a concrete requirements document."
+
+policy:
+  allow_implicit_invocation: true

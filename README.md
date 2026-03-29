@@ -82,21 +82,47 @@ cp -rP ~/.codex-backup-YYYYMMDD-HHMMSS/* ~/.codex/
 
 All skills live in `skills/` and are installed to `~/.codex/skills/` or `./.codex/skills/`.
 
-BMAD Lite workflow:
-- `brainstorm` → product brief in `memory-bank/brief.md`
-- `prd` → requirements in `memory-bank/prd.md`
-- `tech-stack` → architecture in `memory-bank/tech-stack.md`
-- `implementation-plan` → stories in `memory-bank/plan.md`
-- `implement` → read context, code one story, validate, update progress
+Core workflow:
+- `refresh-context` → recover project state before resuming work
+- `brainstorm` → turn a vague idea into a concrete product brief
+- `prd` → write requirements and scope
+- `tech-stack` → translate requirements into architecture
+- `implementation-plan` → break work into implementable stories
+- `next-task` → select the next actionable chunk
+- `implement` → execute the next concrete unit of work
+- `update-progress` → reflect what was actually completed
 
-Development & validation:
-- `validate`, `validate-quick`, `validate-update-push`
-- `next-task`, `refresh-context`, `update-progress`
+Debugging, validation, and release hygiene:
+- `systematic-debugging` → root-cause-first debugging for flaky or non-obvious issues
+- `validate` / `validate-quick` → fast or full verification
+- `completion-verification` → evidence-before-claims before saying work is ready
+- `validate-update-push` → guided end-of-task wrap-up
+- `git-add-commit-push` → explicit Git finalization only when you really want it
+- `security-check`, `db-check`, `seo-check`
+
+Design and UI:
+- `design-director` → define a visual direction before building
+- `design-principles` → precise app/dashboard design constraints
+- `frontend-skill` → stronger art direction for web/app UI
+- `responsive-frontend-designs` → implement UI from screenshots or references
+- `playwright` → browser automation and visual checking
+- `browser-based-games` → plan and build browser games
+
+Utilities:
+- `update-docs`, `sync-config`, `permissions-allow`, `humanizer`
+
+### How Skills Are Invoked
+
+Skills can be used in two ways:
+
+- **Implicit invocation**: Codex can choose a skill automatically when your request clearly matches the skill description.
+- **Explicit invocation**: you can call a skill directly with `$skill-name`, for example `$systematic-debugging` or `$completion-verification`.
+
+This repo intentionally keeps some higher-risk skills **explicit-only**, especially:
 - `git-add-commit-push`
+- `validate-update-push`
 
-Quality & utilities:
-- `security-check`, `db-check`, `seo-check`, `design-principles`
-- `humanizer`, `update-docs`, `sync-config`, `permissions-allow`
+That keeps everyday help automatic while avoiding accidental Git or release actions.
 
 ---
 
@@ -117,6 +143,12 @@ cd /path/to/codex-config
 
 `./sync.sh` updates `config/config.example.toml`, not your real local `config.toml`. Review the generated template before committing to make sure it only contains placeholders.
 
+`./sync.sh` also syncs full skill directories, including nested metadata and helper files such as:
+- `agents/openai.yaml`
+- `scripts/`
+- `references/`
+- `assets/`
+
 ## File Structure
 
 ```
@@ -129,26 +161,27 @@ codex-config/
 │   ├── AGENTS.md
 │   └── config.example.toml
 └── skills/
-    ├── brainstorm/SKILL.md
-    ├── prd/SKILL.md
-    ├── tech-stack/SKILL.md
-    ├── implementation-plan/SKILL.md
-    ├── implement/SKILL.md
-    ├── validate/SKILL.md
-    ├── validate-quick/SKILL.md
-    ├── validate-update-push/SKILL.md
-    ├── next-task/SKILL.md
-    ├── refresh-context/SKILL.md
-    ├── update-progress/SKILL.md
-    ├── git-add-commit-push/SKILL.md
-    ├── security-check/SKILL.md
-    ├── db-check/SKILL.md
-    ├── seo-check/SKILL.md
-    ├── design-principles/SKILL.md
-    ├── update-docs/SKILL.md
-    ├── humanizer/SKILL.md
-    ├── permissions-allow/SKILL.md
-    └── sync-config/SKILL.md
+    ├── brainstorm/
+    │   ├── SKILL.md
+    │   └── agents/openai.yaml
+    ├── completion-verification/
+    │   ├── SKILL.md
+    │   └── agents/openai.yaml
+    ├── playwright/
+    │   ├── SKILL.md
+    │   ├── agents/openai.yaml
+    │   ├── scripts/
+    │   ├── references/
+    │   └── assets/
+    ├── responsive-frontend-designs/
+    │   └── SKILL.md
+    ├── systematic-debugging/
+    │   ├── SKILL.md
+    │   └── agents/openai.yaml
+    ├── worktree-setup/
+    │   ├── SKILL.md
+    │   └── agents/openai.yaml
+    └── ...
 ```
 
 ---

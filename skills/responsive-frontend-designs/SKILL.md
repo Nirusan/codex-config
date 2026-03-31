@@ -1,6 +1,6 @@
 ---
 name: responsive-frontend-designs
-description: Use when the user wants to build or refine a responsive UI from screenshots, mockups, or visual references. Reuse the repo's existing design system and frontend patterns, treat the references as the visual source of truth, and validate the implementation in a real browser with Playwright.
+description: Use when the user wants to build or refine a responsive UI from screenshots, mockups, or visual references. Reuse the repo's existing design system and frontend patterns, treat the references as the visual source of truth, and validate the implementation in a real browser with dev-browser.
 ---
 
 # Responsive Front-End Designs
@@ -23,7 +23,7 @@ Use this skill when a user provides screenshots, design references, or a concise
 
 ## Recommended tools and skills
 
-- Use `$playwright` to inspect the implementation in a real browser, compare desktop and mobile layouts, and iterate visually.
+- Use `$dev-browser` to inspect the implementation in a real browser, compare desktop and mobile layouts, and iterate visually.
 - Use local project docs, `AGENTS.md`, and existing UI files before inventing new patterns.
 - Use Gemini frontend tools only if the repo rules require them for the specific UI task.
 

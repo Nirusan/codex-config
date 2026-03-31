@@ -64,7 +64,8 @@ cd /path/to/your/project
 - `config/config.example.toml` → `~/.codex/config.toml` (ou `./.codex/config.toml`)
 - Modèle public-safe uniquement : aucune vraie clé API ni chemin de projet personnel n'est versionné dans ce repo
 - Modèle, approbations, sandbox, web search
-- MCP servers (OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, Chrome DevTools, Gemini Design, n8n)
+- MCP servers (OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, Gemini Design, n8n)
+- Automation navigateur via la skill/CLI `dev-browser` plutôt qu’un browser MCP
 
 ### Skills
 
@@ -93,11 +94,32 @@ Design et UI :
 - `design-principles` → contraintes de design précises pour apps/dashboards
 - `frontend-skill` → direction artistique plus forte pour UI web/app
 - `responsive-frontend-designs` → implémenter une UI depuis des screenshots ou références
-- `playwright` → automation navigateur et validation visuelle
+- `dev-browser` → automation navigateur et validation visuelle
 - `browser-based-games` → planifier et construire des jeux navigateur
 
 Utilitaires :
 - `update-docs`, `sync-config`, `permissions-allow`, `humanizer`
+
+### Setup automation navigateur
+
+Ce repo utilise `dev-browser` pour l’automation navigateur en live au lieu d’un browser MCP.
+`./install.sh` installe automatiquement la version vendoriée de [skills/dev-browser/SKILL.md](/Users/nirusan/Sites/codex-config/skills/dev-browser/SKILL.md) dans le dossier de skills Codex.
+
+```bash
+pnpm add -g dev-browser
+dev-browser install
+dev-browser --help
+```
+
+Installation manuelle au format Amp/Codex, si tu veux récupérer la skill upstream directement :
+
+```bash
+SKILLS_DIR=~/.codex/skills
+mkdir -p "$SKILLS_DIR"
+git clone https://github.com/sawyerhood/dev-browser /tmp/dev-browser-skill
+cp -r /tmp/dev-browser-skill/skills/dev-browser "$SKILLS_DIR/dev-browser"
+rm -rf /tmp/dev-browser-skill
+```
 
 ### Comment les skills s’activent
 
@@ -155,12 +177,9 @@ codex-config/
     ├── completion-verification/
     │   ├── SKILL.md
     │   └── agents/openai.yaml
-    ├── playwright/
+    ├── dev-browser/
     │   ├── SKILL.md
-    │   ├── agents/openai.yaml
-    │   ├── scripts/
-    │   ├── references/
-    │   └── assets/
+    │   └── agents/openai.yaml
     ├── responsive-frontend-designs/
     │   └── SKILL.md
     ├── systematic-debugging/

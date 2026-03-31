@@ -1,6 +1,6 @@
 ---
 name: browser-based-games
-description: Use when the user wants to plan, build, test, or iterate on a browser-based game. Start by defining a concrete PLAN.md, then implement and tune the game in a live browser with Playwright, generate assets with Imagegen when needed, and check official OpenAI docs before adding OpenAI-powered features.
+description: Use when the user wants to plan, build, test, or iterate on a browser-based game. Start by defining a concrete PLAN.md, then implement and tune the game in a live browser with dev-browser, generate assets with Imagegen when needed, and check official OpenAI docs before adding OpenAI-powered features.
 ---
 
 # Browser-Based Games
@@ -32,7 +32,7 @@ If the user brief is vague, tighten the spec before implementation.
 
 ## Recommended tools and skills
 
-- Use `$playwright` to open the real build, play the game, inspect UI states, and iterate on gameplay feel.
+- Use `$dev-browser` to open the real build, play the game, inspect UI states, and iterate on gameplay feel.
 - Use `$imagegen` for sprites, backgrounds, concept art, UI assets, and prompt reuse.
 - Use `$openai-docs` before wiring OpenAI-powered mechanics or APIs.
 - Use Context7 when the user chooses a rendering/game framework and current framework docs matter.

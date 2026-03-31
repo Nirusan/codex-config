@@ -145,6 +145,7 @@ WHY: Gemini will use placeholders `[Title]`, `[Price]` for missing info. If you 
 ## Tools & Documentation
 
 - Prefer local docs first (`README.md`, `docs/`, `AGENTS.md`)
+- Use the `dev-browser` skill for live browser automation or UI inspection instead of a browser MCP server
 - Use MCP servers for library documentation when available (Context7)
 - Use OpenAI Docs MCP for OpenAI/Codex APIs
 - Use web search only when you need up-to-date or niche information

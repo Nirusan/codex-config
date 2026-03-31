@@ -28,6 +28,7 @@ dest = Path(sys.argv[2])
 text = src.read_text()
 lines = []
 skip_project_block = False
+skip_legacy_browser_block = False
 
 def redact_value(key: str, value: str) -> str:
     key_lower = key.lower()
@@ -64,6 +65,16 @@ def redact_value(key: str, value: str) -> str:
 
 for line in text.splitlines():
     stripped = line.strip()
+
+    if skip_legacy_browser_block:
+        if stripped.startswith("[") and not stripped.startswith("[mcp_servers.chrome-devtools"):
+            skip_legacy_browser_block = False
+        else:
+            continue
+
+    if stripped.startswith("[mcp_servers.chrome-devtools"):
+        skip_legacy_browser_block = True
+        continue
 
     if stripped.startswith('[projects."'):
         skip_project_block = True

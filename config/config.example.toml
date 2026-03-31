@@ -41,9 +41,10 @@ url = "https://mcp.exa.ai/mcp"
 [mcp_servers.exa.http_headers]
 Authorization = "YOUR_AUTHORIZATION_HERE"
 
-[mcp_servers.chrome-devtools]
-command = "npx"
-args = ["chrome-devtools-mcp@latest"]
+# Browser automation uses the `dev-browser` skill/CLI instead of an MCP server.
+# Install separately:
+# pnpm add -g dev-browser
+# dev-browser install
 
 [mcp_servers.n8n-mcp]
 command = "npx"

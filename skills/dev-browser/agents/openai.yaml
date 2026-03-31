@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dev Browser"
+  short_description: "Automate real browsers with dev-browser"
+  default_prompt: "Use $dev-browser to automate this browser workflow and produce reliable terminal commands."
+
+policy:
+  allow_implicit_invocation: true

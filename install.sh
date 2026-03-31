@@ -91,6 +91,11 @@ fi
 
 mkdir -p "$CODEX_DIR/skills"
 
+# Remove the legacy browser skill after the rename to dev-browser.
+if [[ -d "$CODEX_DIR/skills/playwright" ]]; then
+  rm -rf "$CODEX_DIR/skills/playwright"
+fi
+
 # Detect if running from local clone or remote
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [[ -f "$SCRIPT_DIR/config/config.example.toml" ]]; then
@@ -116,8 +121,11 @@ install_file() {
 extract_mcp_sections() {
   local file="$1"
   awk '
-    /^\[mcp_servers(\.|$)/ { keep=1 }
+    /^\[mcp_servers\.chrome-devtools(\.|$)/ { keep=0; skip_legacy=1; next }
+    /^\[/ && skip_legacy && $0 !~ /^\[mcp_servers\.chrome-devtools(\.|$)/ { skip_legacy=0 }
+    /^\[mcp_servers(\.|$)/ && !skip_legacy { keep=1 }
     /^\[/ && $0 !~ /^\[mcp_servers(\.|$)/ { keep=0 }
+    skip_legacy { next }
     keep { print }
   ' "$file"
 }
@@ -202,7 +210,7 @@ SKILLS=(
   "implement"
   "implementation-plan"
   "next-task"
-  "playwright"
+  "dev-browser"
   "permissions-allow"
   "prd"
   "refresh-context"

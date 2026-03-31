@@ -68,7 +68,7 @@ Do not patch symptoms first. Understand the failure path first.
 - use the browser directly before editing
 - inspect console, network, screenshots, and visible state
 - compare what the user sees to what the code assumes
-- use `$playwright` when a live browser check is useful
+- use `$dev-browser` when a live browser check is useful
 
 ### Auth, permissions, and security-sensitive flows
 

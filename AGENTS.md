@@ -146,6 +146,9 @@ WHY: Gemini will use placeholders `[Title]`, `[Price]` for missing info. If you 
 
 - Prefer local docs first (`README.md`, `docs/`, `AGENTS.md`)
 - Use the `dev-browser` skill for live browser automation or UI inspection instead of a browser MCP server
+- `dev-browser` reuses a daemon and named browser instances. If a browser was previously started with `--headless`, stop the daemon with `dev-browser stop` or use a different `--browser` name before expecting a visible window.
+- Visible `dev-browser` sessions open in `Google Chrome for Testing`, not necessarily the user's regular Chrome profile. Use `dev-browser --connect` when you want to drive an already-open local Chrome session.
+- Prefer `--headless` for repeatable UI checks and automation. Prefer visible mode for debugging layout, focus, hover, animation, or responsive issues.
 - Use MCP servers for library documentation when available (Context7)
 - Use OpenAI Docs MCP for OpenAI/Codex APIs
 - Use web search only when you need up-to-date or niche information

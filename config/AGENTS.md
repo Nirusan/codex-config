@@ -69,78 +69,46 @@ Global instructions applied to all Next.js/React projects.
 
 - **Production-ready** designs, not generic or cookie-cutter
 
-## MCP Gemini Design - Mandatory Unique Workflow
+## Frontend / Design Workflow
 
-### Absolute Rule
+### Default Rule
 
-You NEVER write frontend/UI code yourself. Gemini is your frontend developer.
+Do NOT use `gemini-design-mcp` or Gemini-specific frontend tooling unless the user explicitly asks for Gemini or names that MCP.
 
-### Available Tools
+### Preferred Workflow
 
-- `generate_vibes`: Generates a visual page with 5 differently styled sections. The user opens the page, sees all 5 vibes, and picks their favorite. The code from the chosen vibe becomes `design-system.md`.
-- `create_frontend`: Creates a NEW complete file (page, component, section).
-- `modify_frontend`: Makes ONE design modification to existing code. Returns a FIND/REPLACE block to apply.
-- `snippet_frontend`: Generates a code snippet to INSERT into an existing file. For adding elements without rewriting the entire file.
+For frontend and design work, follow this order:
 
-### Workflow (No Alternatives)
+1. Read the local sources of truth first:
+   - `AGENTS.md`
+   - repo-root `SKILL.md` if present
+   - `design-system.md` if present
+   - real product copy, labels, states, and data values
+   - screenshots, mockups, or references provided by the user
+2. Prefer the installed skill stack over an external generator:
+   - `design-director` when the direction is fuzzy or needs a durable brief
+   - `frontend-skill` for net-new visually strong UI
+   - `design-principles` for precise app or dashboard surfaces
+   - `responsive-frontend-designs` when matching screenshots or references
+   - `dev-browser` for visual review and iteration
+3. Prefer the Taste Skill family for frontend aesthetics when the task matches:
+   - `taste-skill` for net-new premium UI
+   - `redesign-skill` for upgrading an existing interface
+   - `minimalist-skill` for calmer product surfaces
+   - `soft-skill` for softer or luxury branding
+   - `output-skill` when complete, no-placeholder output matters
+4. If a project-level `SKILL.md` from Taste Skill exists, treat it as a repo-specific override on top of the global workflow.
+5. Write frontend code directly unless a repo-level workflow explicitly requires another generator.
 
-#### Step 1: Check for `design-system.md`
+### Taste Skill Guidance
 
-BEFORE any frontend call, check if `design-system.md` exists at project root.
+Taste Skill is part of the preferred global frontend workflow in this config. Use project-level Taste Skill files when a repo needs extra specificity or a stronger local override.
 
-#### Step 2A: If `design-system.md` DOES NOT EXIST
+### Guardrails
 
-1. Call `generate_vibes` with `projectDescription`, `projectType`, `techStack`.
-2. Receive the code for a page with 5 visual sections.
-3. Ask: "You don't have a design system. Can I create vibes-selection.tsx so you can visually choose your style?"
-4. If yes, write the page to the file.
-5. User chooses: "vibe 3" or "the 5th one".
-6. Extract THE ENTIRE CODE between `<!-- VIBE_X_START -->` and `<!-- VIBE_X_END -->`.
-7. Save it to `design-system.md`.
-8. Ask: "Delete vibes-selection.tsx?"
-9. Continue normally.
-
-#### Step 2B: If `design-system.md` EXISTS
-
-Read it and use its content for frontend calls.
-
-#### Step 3: Frontend Calls
-
-For EVERY call (`create_frontend`, `modify_frontend`, `snippet_frontend`), you MUST pass:
-
-- `designSystem`: Copy-paste the ENTIRE content of `design-system.md` (all the code, not a summary).
-- `context`: Functional/business context WITH ALL REAL DATA. Include:
-  - What it does, features, requirements.
-  - ALL real text/labels to display (status labels, button text, titles...).
-  - ALL real data values (prices, stats, numbers...).
-  - Enum values and their exact meaning.
-  - Any business-specific information.
-
-WHY: Gemini will use placeholders `[Title]`, `[Price]` for missing info. If you don't provide real data, you'll get placeholders or worse - fake data.
-
-### Forbidden
-
-- Writing frontend without Gemini.
-- Skipping the vibes workflow when `design-system.md` is missing.
-- Extracting "rules" instead of THE ENTIRE code.
-- Manually creating `design-system.md`.
-- Passing design/styling info in `context` (that goes in `designSystem`).
-- Summarizing the design system instead of copy-pasting it entirely.
-- Calling Gemini without providing real data (labels, stats, prices, etc.) → leads to fake info.
-
-### Expected
-
-- Check for `design-system.md` BEFORE anything.
-- Follow the complete vibes workflow if missing.
-- Pass the FULL `design-system.md` content in `designSystem`.
-- Pass functional context in `context` (purpose, features, requirements).
-
-### Exceptions (You Can Code These Yourself)
-
-- Text-only changes.
-- JS logic without UI.
-- Non-visual bug fixes.
-- Data wiring (`useQuery`, etc.).
+- Do not invent fake product copy, prices, metrics, or enum values.
+- Preserve an existing `design-system.md` unless the user asks for a redesign.
+- Use Gemini only as an explicit opt-in tool, never as a mandatory default.
 
 ## Skill Routing Heuristics
 
@@ -152,12 +120,14 @@ Use the built-in skill system normally. Do not force a separate router workflow.
 - If the task would benefit from isolation or parallel branch work, use `worktree-setup`.
 - If a bug is flaky, surprising, or resists the obvious fix, use `systematic-debugging` before editing.
 - If the request is still fuzzy or product-level, use `brainstorm`, `prd`, `tech-stack`, or `implementation-plan` instead of jumping into code.
+- For frontend work, prefer the Taste Skill family when the request is primarily aesthetic or design-quality-sensitive.
+- If a repo-local `SKILL.md` exists (for example from `taste-skill`), read it before frontend implementation and treat it as project-specific guidance.
 - Before claiming a fix is done, a feature is ready, or a merge is safe, use `completion-verification`.
 - Treat `git-add-commit-push` and `validate-update-push` as explicit endgame skills, not automatic defaults.
 
 ## Tools & Documentation
 
-- Prefer local docs first (`README.md`, `docs/`, `AGENTS.md`)
+- Prefer local docs first (`README.md`, `docs/`, `AGENTS.md`, repo-root `SKILL.md`, `design-system.md`)
 - Use the `dev-browser` skill for live browser automation or UI inspection instead of a browser MCP server
 - Use MCP servers for library documentation when available (Context7)
 - Use OpenAI Docs MCP for OpenAI/Codex APIs

@@ -64,7 +64,7 @@ cd /path/to/your/project
 - `config/config.example.toml` → `~/.codex/config.toml` (ou `./.codex/config.toml`)
 - Modèle public-safe uniquement : aucune vraie clé API ni chemin de projet personnel n'est versionné dans ce repo
 - Modèle, approbations, sandbox, web search
-- MCP servers (OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, Gemini Design, n8n)
+- MCP servers (OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, n8n)
 - Automation navigateur via la skill/CLI `dev-browser` plutôt qu’un browser MCP
 
 ### Skills
@@ -93,9 +93,21 @@ Design et UI :
 - `design-director` → cadrer une direction visuelle avant de construire
 - `design-principles` → contraintes de design précises pour apps/dashboards
 - `frontend-skill` → direction artistique plus forte pour UI web/app
+- `taste-skill` → base premium pour générer une nouvelle UI frontend
+- `redesign-skill` → auditer puis améliorer une interface existante
+- `minimalist-skill` → surfaces produit plus calmes et éditoriales
+- `soft-skill` → langage visuel plus doux et plus luxueux
+- `output-skill` → pousse vers des sorties complètes sans placeholders
 - `responsive-frontend-designs` → implémenter une UI depuis des screenshots ou références
 - `dev-browser` → automation navigateur et validation visuelle
 - `browser-based-games` → planifier et construire des jeux navigateur
+
+Workflow frontend recommandé :
+- Garde Gemini Design hors de la config par défaut. Utilise `gemini-design-mcp` uniquement quand tu veux explicitement cet outil dans un repo précis.
+- Préfère `design-director` pour clarifier la direction, puis construis avec les skills frontend installées globalement.
+- Utilise la famille Taste Skill comme couche esthétique par défaut pour le frontend dans cette config.
+- Laisse un `SKILL.md` local de Taste Skill ajouter des overrides spécifiques à un projet quand c’est utile.
+- Bon mapping : `taste-skill` pour une nouvelle UI premium, `redesign-skill` pour une refonte, `minimalist-skill` pour des surfaces produit plus calmes, `output-skill` quand tu veux des sorties entièrement développées.
 
 Utilitaires :
 - `update-docs`, `sync-config`, `permissions-allow`, `humanizer`
@@ -131,6 +143,8 @@ Les skills peuvent être utilisées de deux façons :
 Ce repo garde volontairement certaines skills plus sensibles en **explicite uniquement**, notamment :
 - `git-add-commit-push`
 - `validate-update-push`
+
+Pour le design, cette config traite maintenant la famille Taste Skill comme une partie du socle frontend global, tout en gardant les `SKILL.md` locaux comme meilleur endroit pour des contraintes spécifiques à un projet.
 
 Ça permet de garder l’aide quotidienne fluide sans déclencher des actions Git ou de release par accident.
 

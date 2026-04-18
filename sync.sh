@@ -29,6 +29,7 @@ text = src.read_text()
 lines = []
 skip_project_block = False
 skip_legacy_browser_block = False
+skip_gemini_block = False
 
 def redact_value(key: str, value: str) -> str:
     key_lower = key.lower()
@@ -72,8 +73,18 @@ for line in text.splitlines():
         else:
             continue
 
+    if skip_gemini_block:
+        if stripped.startswith("[") and not stripped.startswith("[mcp_servers.gemini-design-mcp"):
+            skip_gemini_block = False
+        else:
+            continue
+
     if stripped.startswith("[mcp_servers.chrome-devtools"):
         skip_legacy_browser_block = True
+        continue
+
+    if stripped.startswith("[mcp_servers.gemini-design-mcp"):
+        skip_gemini_block = True
         continue
 
     if stripped.startswith('[projects."'):
@@ -84,10 +95,6 @@ for line in text.splitlines():
             skip_project_block = False
         else:
             continue
-
-    if stripped.startswith("[mcp_servers.gemini-design-mcp]"):
-        lines.append(line)
-        continue
 
     if stripped.startswith("[notice.model_migrations]"):
         lines.append(line)

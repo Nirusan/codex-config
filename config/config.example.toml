@@ -57,14 +57,6 @@ MCP_MODE = "stdio"
 N8N_API_KEY = "YOUR_N8N_API_KEY_HERE"
 N8N_API_URL = "https://your-service.example.com"
 
-[mcp_servers.gemini-design-mcp]
-command = "node"
-args = ["/path/to/your/local/tool"]
-
-[mcp_servers.gemini-design-mcp.env]
-GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"
-GEMINI_MODEL = "gemini-3-pro-preview"
-
 [notice.model_migrations]
 "gpt-5.2" = "gpt-5.2-codex"
 

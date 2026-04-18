@@ -122,10 +122,12 @@ extract_mcp_sections() {
   local file="$1"
   awk '
     /^\[mcp_servers\.chrome-devtools(\.|$)/ { keep=0; skip_legacy=1; next }
+    /^\[mcp_servers\.gemini-design-mcp(\.|$)/ { keep=0; skip_gemini=1; next }
     /^\[/ && skip_legacy && $0 !~ /^\[mcp_servers\.chrome-devtools(\.|$)/ { skip_legacy=0 }
+    /^\[/ && skip_gemini && $0 !~ /^\[mcp_servers\.gemini-design-mcp(\.|$)/ { skip_gemini=0 }
+    skip_legacy || skip_gemini { next }
     /^\[mcp_servers(\.|$)/ && !skip_legacy { keep=1 }
     /^\[/ && $0 !~ /^\[mcp_servers(\.|$)/ { keep=0 }
-    skip_legacy { next }
     keep { print }
   ' "$file"
 }
@@ -209,15 +211,20 @@ SKILLS=(
   "humanizer"
   "implement"
   "implementation-plan"
+  "minimalist-skill"
   "next-task"
+  "output-skill"
   "dev-browser"
   "permissions-allow"
   "prd"
   "refresh-context"
+  "redesign-skill"
   "responsive-frontend-designs"
   "security-check"
   "seo-check"
+  "soft-skill"
   "systematic-debugging"
+  "taste-skill"
   "sync-config"
   "tech-stack"
   "update-docs"

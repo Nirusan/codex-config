@@ -76,7 +76,7 @@ cp -rP ~/.codex-backup-YYYYMMDD-HHMMSS/* ~/.codex/
 - `config/config.example.toml` → installed to `~/.codex/config.toml` (or `./.codex/config.toml`)
 - Public-safe template only: no real API keys or personal project paths are stored in this repo
 - Model defaults, approvals, sandbox mode, web search
-- MCP server templates (OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, Gemini Design, n8n)
+- MCP server templates (OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, n8n)
 - Browser automation via the `dev-browser` skill/CLI instead of a browser MCP server
 
 ### Skills
@@ -105,9 +105,21 @@ Design and UI:
 - `design-director` → define a visual direction before building
 - `design-principles` → precise app/dashboard design constraints
 - `frontend-skill` → stronger art direction for web/app UI
+- `taste-skill` → premium frontend generation defaults for new UI work
+- `redesign-skill` → audit and upgrade an existing interface
+- `minimalist-skill` → calmer editorial/product surfaces
+- `soft-skill` → softer premium/luxury visual language
+- `output-skill` → pushes for complete, no-placeholder frontend output
 - `responsive-frontend-designs` → implement UI from screenshots or references
 - `dev-browser` → browser automation and visual checking
 - `browser-based-games` → plan and build browser games
+
+Recommended frontend workflow:
+- Keep Gemini Design out of the default config. Use `gemini-design-mcp` only when you explicitly want that tool in a specific repo.
+- Prefer `design-director` to clarify direction, then build with the globally installed frontend skills.
+- Use the Taste Skill family as the default aesthetic layer for frontend work in this config.
+- Let a repo-local `SKILL.md` from Taste Skill add project-specific overrides when needed.
+- Good pairing: `taste-skill` for new premium UI, `redesign-skill` for upgrades, `minimalist-skill` for calmer product surfaces, `output-skill` when you want fully expanded outputs.
 
 Utilities:
 - `update-docs`, `sync-config`, `permissions-allow`, `humanizer`
@@ -143,6 +155,8 @@ Skills can be used in two ways:
 This repo intentionally keeps some higher-risk skills **explicit-only**, especially:
 - `git-add-commit-push`
 - `validate-update-push`
+
+For design guidance, this config now treats the Taste Skill family as part of the default global frontend stack, while repo-local `SKILL.md` files remain the best way to add project-specific design constraints.
 
 That keeps everyday help automatic while avoiding accidental Git or release actions.
 

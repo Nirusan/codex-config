@@ -1,6 +1,6 @@
 ---
-name: high-end-visual-design
-description: Teaches the AI to design like a high-end agency. Defines the exact fonts, spacing, shadows, card structures, and animations that make a website feel expensive. Blocks all the common defaults that make AI designs look cheap or generic.
+name: soft-skill
+description: High-end agency-style design guidance. Defines the fonts, spacing, shadows, card structures, and motion patterns that make a website feel expensive while blocking generic defaults.
 ---
 
 # Agent Skill: Principal UI/UX Architect & Motion Choreographer (Awwwards-Tier)

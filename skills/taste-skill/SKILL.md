@@ -1,6 +1,6 @@
 ---
-name: design-taste-frontend
-description: Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering.
+name: taste-skill
+description: Premium frontend generation defaults. Overrides generic LLM UI habits with stricter layout, typography, motion, and anti-slop rules for net-new interfaces.
 ---
 
 # High-Agency Frontend Skill

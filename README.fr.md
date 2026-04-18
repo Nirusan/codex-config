@@ -92,7 +92,7 @@ Debug, validation et qualité de livraison :
 Design et UI :
 - `design-director` → cadrer une direction visuelle avant de construire
 - `design-principles` → contraintes de design précises pour apps/dashboards
-- `frontend-skill` → direction artistique plus forte pour UI web/app
+- `frontend-skill` → guide complémentaire pour composition, hiérarchie et retenue
 - `taste-skill` → base premium pour générer une nouvelle UI frontend
 - `redesign-skill` → auditer puis améliorer une interface existante
 - `minimalist-skill` → surfaces produit plus calmes et éditoriales
@@ -105,7 +105,9 @@ Design et UI :
 Workflow frontend recommandé :
 - Garde Gemini Design hors de la config par défaut. Utilise `gemini-design-mcp` uniquement quand tu veux explicitement cet outil dans un repo précis.
 - Préfère `design-director` pour clarifier la direction, puis construis avec les skills frontend installées globalement.
-- Utilise la famille Taste Skill comme couche esthétique par défaut pour le frontend dans cette config.
+- Utilise la famille Taste Skill comme couche principale d’exécution esthétique pour le frontend dans cette config.
+- Garde `frontend-skill` comme guide complémentaire pour la composition de layout, la hiérarchie, l’enchaînement des sections et la retenue.
+- Ne traite pas `taste-skill` et `frontend-skill` comme deux copilotes égaux du même passage : Taste mène, `frontend-skill` relit la composition ensuite.
 - Laisse un `SKILL.md` local de Taste Skill ajouter des overrides spécifiques à un projet quand c’est utile.
 - Bon mapping : `taste-skill` pour une nouvelle UI premium, `redesign-skill` pour une refonte, `minimalist-skill` pour des surfaces produit plus calmes, `output-skill` quand tu veux des sorties entièrement développées.
 

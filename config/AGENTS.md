@@ -87,22 +87,38 @@ For frontend and design work, follow this order:
    - screenshots, mockups, or references provided by the user
 2. Prefer the installed skill stack over an external generator:
    - `design-director` when the direction is fuzzy or needs a durable brief
-   - `frontend-skill` for net-new visually strong UI
-   - `design-principles` for precise app or dashboard surfaces
-   - `responsive-frontend-designs` when matching screenshots or references
-   - `dev-browser` for visual review and iteration
-3. Prefer the Taste Skill family for frontend aesthetics when the task matches:
-   - `taste-skill` for net-new premium UI
-   - `redesign-skill` for upgrading an existing interface
+   - `taste-skill` as the default premium execution layer for net-new frontend work
+   - `redesign-skill` when upgrading an existing interface
    - `minimalist-skill` for calmer product surfaces
    - `soft-skill` for softer or luxury branding
    - `output-skill` when complete, no-placeholder output matters
-4. If a project-level `SKILL.md` from Taste Skill exists, treat it as a repo-specific override on top of the global workflow.
-5. Write frontend code directly unless a repo-level workflow explicitly requires another generator.
+   - `frontend-skill` as a complementary composition and narrative-structure guide, especially for landing pages
+   - `design-principles` for precise app or dashboard surfaces
+   - `responsive-frontend-designs` when matching screenshots or references
+   - `dev-browser` for visual review and iteration
+3. If a project-level `SKILL.md` from Taste Skill exists, treat it as a repo-specific override on top of the global workflow.
+4. Write frontend code directly unless a repo-level workflow explicitly requires another generator.
 
 ### Taste Skill Guidance
 
 Taste Skill is part of the preferred global frontend workflow in this config. Use project-level Taste Skill files when a repo needs extra specificity or a stronger local override.
+
+`frontend-skill` still has value. It is not the primary anti-slop engine anymore, but it remains useful for:
+
+- landing-page composition
+- section sequencing and hierarchy
+- restraint around cards, copy, and motion
+- checking whether a screen reads clearly at a glance
+
+### Coordination Rule
+
+When both `taste-skill` and `frontend-skill` are relevant, do NOT treat them as equal co-owners of the same pass.
+
+- `taste-skill` owns the visual direction and execution defaults.
+- `frontend-skill` acts as a secondary composition check for hierarchy, section flow, and restraint.
+- Do not let both skills redefine palette, typography, motion style, or overall layout structure in parallel.
+- If they conflict, keep the Taste Skill direction and use `frontend-skill` only to simplify, clarify, or rebalance.
+- Recommended order: `design-director` → `taste-skill` → `frontend-skill` check.
 
 ### Guardrails
 
@@ -120,7 +136,8 @@ Use the built-in skill system normally. Do not force a separate router workflow.
 - If the task would benefit from isolation or parallel branch work, use `worktree-setup`.
 - If a bug is flaky, surprising, or resists the obvious fix, use `systematic-debugging` before editing.
 - If the request is still fuzzy or product-level, use `brainstorm`, `prd`, `tech-stack`, or `implementation-plan` instead of jumping into code.
-- For frontend work, prefer the Taste Skill family when the request is primarily aesthetic or design-quality-sensitive.
+- For frontend work, prefer the Taste Skill family as the primary execution layer when the request is aesthetic or design-quality-sensitive.
+- Use `frontend-skill` as secondary guidance when the main need is composition, hierarchy, section flow, or restraint.
 - If a repo-local `SKILL.md` exists (for example from `taste-skill`), read it before frontend implementation and treat it as project-specific guidance.
 - Before claiming a fix is done, a feature is ready, or a merge is safe, use `completion-verification`.
 - Treat `git-add-commit-push` and `validate-update-push` as explicit endgame skills, not automatic defaults.

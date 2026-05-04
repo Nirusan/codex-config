@@ -10,9 +10,37 @@ Project-level instructions for Next.js and React web applications.
 - Prefer Server Actions over API Routes when the task fits the App Router model.
 - Follow the Next.js docs for Data Fetching, Rendering, Routing, Metadata, and Caching.
 - Avoid waterfalls: fetch independent data with `Promise.all()`.
-- Use `React.cache()` for functions called multiple times in one render path.
+- Use `React.cache()` for render-path memoization when the same server read is called multiple times; do not use it as a substitute for persistent cache invalidation.
 - Import directly instead of using barrels, especially for icon libraries.
 - Keep global state in client components; prefer Zustand over React Context for shared client state.
+
+## TypeScript And Routing
+
+- Enable `typedRoutes` when the project supports it, and ensure `.next/types/**/*.ts` is included in `tsconfig`.
+- Use route-aware helpers such as `PageProps`, `LayoutProps`, and `RouteContext` for App Router files when generated types are available.
+- Type App Router `params` and `searchParams` as promises when the installed Next.js version expects it.
+- Prefer `next.config.ts` with `NextConfig` in TypeScript projects.
+
+## Server Boundaries And Data Safety
+
+- Use `import 'server-only'` for modules that access secrets, databases, the filesystem, or private environment variables.
+- Do not import server-only modules into Client Components.
+- Pass serialized DTOs to Client Components instead of raw ORM records, sessions, tokens, or privileged domain objects.
+- Centralize environment variable parsing in a server-only module and avoid scattered non-null assertions.
+
+## Mutations, Auth, And Route Handlers
+
+- Treat Server Actions and Route Handlers as public endpoints: validate input, check authorization, and return typed expected-error states.
+- Use Server Actions for UI-driven mutations and Route Handlers for webhooks, third-party callbacks, public APIs, and non-UI protocols.
+- After mutations, intentionally call `updateTag`, `revalidateTag`, `revalidatePath`, or `redirect` as appropriate.
+- Use `useActionState` and `useFormStatus` for progressive form UX when returning validation errors.
+
+## Caching And Rendering
+
+- Choose an explicit cache policy for important server data reads.
+- Tag cached data that needs event-driven invalidation.
+- Use `updateTag` for read-your-own-writes flows in Server Actions, and `revalidateTag` or `revalidatePath` for broader cache refreshes.
+- Avoid legacy or experimental cache APIs unless the project already opts into that caching model.
 
 ## UI And Styling
 
@@ -34,15 +62,11 @@ Project-level instructions for Next.js and React web applications.
   - screenshots, mockups, or references provided by the user
 - Prefer the installed skill stack over external generators:
   - `design-director` when the direction is fuzzy or needs a durable brief
-  - `design-taste-frontend` as the default premium execution layer for net-new frontend work
-  - `gpt-taste` for stricter GPT/Codex high-variance frontend passes
-  - `image-taste-frontend` when visual quality needs an image-first workflow
-  - `redesign-existing-projects` when upgrading an existing interface
-  - `minimalist-ui` for calmer product surfaces
-  - `high-end-visual-design` for softer or luxury branding
-  - `industrial-brutalist-ui` for harder Swiss/brutalist visual direction
-  - `stitch-design-taste` for Google Stitch-compatible design output
-  - `full-output-enforcement` when complete, no-placeholder output matters
+  - `taste-skill` as the default premium execution layer for net-new frontend work
+  - `redesign-skill` when upgrading an existing interface
+  - `minimalist-skill` for calmer product surfaces
+  - `soft-skill` for softer or luxury branding
+  - `output-skill` when complete, no-placeholder output matters
   - `frontend-skill` as a complementary composition and narrative-structure guide, especially for landing pages
   - `design-principles` for precise app or dashboard surfaces
   - `responsive-frontend-designs` when matching screenshots or references
@@ -56,6 +80,10 @@ Project-level instructions for Next.js and React web applications.
 - Optimize Web Vitals, especially LCP, CLS, and INP.
 - Use explicit image dimensions, lazy loading, and modern formats such as WebP or AVIF when appropriate.
 - Prefer `next/image` for local/remote images when it fits the project constraints.
+- Provide a `sizes` prop for `next/image` when using `fill` or responsive CSS sizing.
+- Use `preload` for the single likely LCP image in Next 16+ instead of deprecated `priority`.
+- Use `next/font` for app fonts to avoid font-related layout shift.
+- Use `next/script` for third-party scripts and choose an intentional loading strategy.
 - Avoid layout shifts from dynamic content, late-loading media, and unstable containers.
 - Do not use `h-screen` for full-height mobile browser surfaces; prefer dynamic viewport units such as `min-h-[100dvh]`.
 - Avoid expensive blur, shadow, or scroll effects on large scrolling containers.
@@ -77,6 +105,8 @@ Project-level instructions for Next.js and React web applications.
 - If the user explicitly asks for Browser Use or the in-app browser, open/control that surface first; do not substitute terminal-only browser tooling unless it is a secondary verification step.
 - Check at least one desktop and one mobile viewport for meaningful UI changes.
 - For deterministic assertions, use Playwright or the repo's existing test harness.
+- Run `pnpm typecheck` and `pnpm lint` before claiming Next.js or TypeScript changes are ready when those scripts exist.
+- Run `pnpm build` after changes to routing, metadata, caching, Server Actions, Next config, or generated route types.
 
 ## Local Dev Servers
 
@@ -93,6 +123,7 @@ Project-level instructions for Next.js and React web applications.
 
 - Prefer `app/` App Router conventions for new Next.js work unless the project already uses `pages/`.
 - Keep `strict: true` in `tsconfig`.
+- Prefer `exactOptionalPropertyTypes` and `noUncheckedIndexedAccess` for new strict TypeScript projects when the repo can adopt them without churn.
 - Prefer the `@/` import alias when configured.
 - Respect existing Tailwind version and configuration before editing styling infrastructure.
 - If `components.json` exists, follow the local shadcn/ui aliases and component paths.

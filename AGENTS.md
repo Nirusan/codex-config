@@ -22,6 +22,11 @@ Global instructions applied across projects. Stack-specific rules belong in proj
 - Keep TypeScript strict mode enabled (`"strict": true` in `tsconfig`).
 - Avoid `any`; use `unknown`, generics, discriminated unions, or proper domain types.
 - Prefer inference when obvious and explicit types for public function signatures.
+- Prefer type-only imports (`import type`) when imports are used only for types.
+- Validate external data at runtime before trusting it, including API responses, storage, environment variables, URL params, and webhooks.
+- Use exhaustive handling for discriminated unions with `never`, `assertNever`, or `satisfies` where it improves safety.
+- Type public boundaries explicitly, including shared hooks, exported helpers, handlers, schemas, and cross-module contracts.
+- Prefer `exactOptionalPropertyTypes` and `noUncheckedIndexedAccess` for new strict TypeScript projects, or when an existing repo can adopt them without broad unrelated edits.
 
 ## Code Style
 

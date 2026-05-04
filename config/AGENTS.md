@@ -57,6 +57,8 @@ Global instructions applied across projects. Stack-specific rules belong in proj
 
 - Build production-ready interfaces, not generic or cookie-cutter screens.
 - Prefer the repo's existing design system, UI primitives, and styling method.
+- Do not use `gemini-design-mcp` or Gemini-specific frontend tooling unless the user explicitly asks for Gemini or names that MCP.
+- Use Gemini only as an explicit opt-in tool, never as a mandatory default.
 - Do not invent fake product copy, prices, metrics, enum values, or states.
 - Preserve an existing `design-system.md` unless the user asks for a redesign.
 - Use visual review tools only when they match the runtime: browser tools for web targets, native/simulator/device checks for mobile targets.

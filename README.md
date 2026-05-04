@@ -139,6 +139,12 @@ Design and UI:
 - `taste-skill`, `redesign-skill`, `minimalist-skill`, `soft-skill`, `output-skill`
 - `responsive-frontend-designs`, `dev-browser`, `browser-based-games`
 
+Expo companion skills:
+- Official Expo skills from [expo/skills](https://github.com/expo/skills), vendored under `skills/` and installed with this config.
+- UI, native, and runtime: `building-native-ui`, `expo-dev-client`, `expo-module`, `expo-ui-swift-ui`, `expo-ui-jetpack-compose`, `use-dom`
+- Data, server, and styling: `native-data-fetching`, `expo-api-routes`, `expo-tailwind-setup`
+- Release and operations: `upgrading-expo`, `expo-cicd-workflows`, `expo-deployment`, `eas-update-insights`
+
 Recommended frontend workflow:
 - Keep Gemini Design out of the default config unless explicitly requested.
 - Apply `$setup-next` for serious Next.js projects and `$setup-expo` for serious Expo / React Native projects.
@@ -178,6 +184,7 @@ cd /path/to/codex-config
 codex-config/
 ├── README.md
 ├── README.fr.md
+├── THIRD_PARTY_NOTICES.md
 ├── install.sh
 ├── sync.sh
 ├── config/
@@ -203,3 +210,5 @@ codex-config/
 ## License
 
 MIT - Feel free to fork and customize.
+
+Vendored third-party skill notices are listed in `THIRD_PARTY_NOTICES.md`.

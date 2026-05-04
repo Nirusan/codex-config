@@ -13,6 +13,23 @@ Project-level instructions for Expo and React Native applications.
 - Prefer `app.config.ts` or `app.json` plus config plugins for native configuration.
 - With Continuous Native Generation or prebuild, avoid hand-editing `ios/` and `android/` unless the repo clearly owns native folders.
 
+## Expo Skills
+
+- Use the official Expo companion skills when the task matches their scope, while keeping this profile and project-local conventions authoritative.
+- Adapt package-manager examples from imported Expo skills to this config's `pnpm` preference unless a project script or Expo/EAS CLI requirement says otherwise.
+- Use `building-native-ui` for Expo Router UI, native navigation patterns, animations, media, visual effects, storage, tabs, search, and native controls.
+- Use `native-data-fetching` for network requests, API calls, caching, offline behavior, retry/error states, auth tokens, and Expo Router loaders.
+- Use `expo-api-routes` for Expo Router server routes, EAS Hosting API endpoints, server-side secrets, webhooks, and backend validation.
+- Use `expo-dev-client` for custom development builds, native modules, dev-client distribution, and Expo Go vs dev-build decisions.
+- Use `expo-module` when building or modifying Expo native modules, native views, config plugins, lifecycle hooks, or autolinking.
+- Use `expo-tailwind-setup` only when adding or maintaining Tailwind CSS v4, NativeWind v5, or `react-native-css`.
+- Use `expo-ui-swift-ui` for `@expo/ui/swift-ui` work and `expo-ui-jetpack-compose` for `@expo/ui/jetpack-compose` work.
+- Use `use-dom` when running web-only React components inside Expo DOM components or migrating web code incrementally to native.
+- Use `upgrading-expo` for Expo SDK upgrades, New Architecture migration, React 19/Compiler changes, native tabs changes, and deprecated package replacements.
+- Use `expo-cicd-workflows` for `.eas/workflows/` YAML, EAS CI/CD pipelines, and workflow schema validation.
+- Use `expo-deployment` for EAS Build, App Store, Play Store, TestFlight, web hosting, and production submission flows.
+- Use `eas-update-insights` for published EAS Update health, crash rates, launch/install counts, payload size, and OTA-vs-embedded rollout checks.
+
 ## TypeScript And Structure
 
 - Keep `strict: true` and extend Expo's base TypeScript config when the project does so.

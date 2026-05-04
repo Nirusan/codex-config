@@ -82,6 +82,7 @@ Use the built-in skill system normally. When a task clearly matches a skill, pre
 - Use `frontend-skill` as a secondary composition check for hierarchy, section flow, and restraint.
 - Use `setup-next` to add or refresh a Next.js project profile.
 - Use `setup-expo` to add or refresh an Expo/React Native project profile.
+- Use Expo companion skills only when the current project is Expo/React Native, when `codex-profile:expo` is present, or when the user explicitly asks about Expo, React Native, or EAS.
 - Before claiming a fix is done, a feature is ready, or a merge is safe, use `completion-verification`.
 - Treat `git-add-commit-push` and `validate-update-push` as explicit endgame skills, not automatic defaults.
 

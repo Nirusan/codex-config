@@ -32,6 +32,24 @@ Use this skill to prepare an Expo or React Native repo, app folder, or monorepo 
    - native configuration and EAS/dev build signals
    - missing or suspicious validation scripts
    - recommended validation commands
+   - relevant Expo companion skills to use next, when the project facts point to them
+
+## Companion Expo Skills
+
+This config installs the official Expo skills from `expo/skills`. Prefer these task-specific skills after setup when their scope matches the work:
+
+- `building-native-ui` for Expo Router UI, navigation, animations, media, storage, tabs, search, and native controls.
+- `native-data-fetching` for network requests, API calls, caching, offline behavior, retries, auth tokens, and Expo Router loaders.
+- `expo-api-routes` for Expo Router API routes, EAS Hosting API endpoints, webhooks, server-side secrets, and backend validation.
+- `expo-dev-client` for custom development builds, native modules, and Expo Go vs dev-build decisions.
+- `expo-module` for native modules, native views, config plugins, lifecycle hooks, and autolinking.
+- `expo-tailwind-setup` for Tailwind CSS v4, NativeWind v5, and `react-native-css`.
+- `expo-ui-swift-ui` and `expo-ui-jetpack-compose` for `@expo/ui` native UI work.
+- `use-dom` for Expo DOM components and incremental web-to-native migrations.
+- `upgrading-expo` for SDK upgrades, New Architecture, React 19/Compiler, native tabs, and deprecated package replacements.
+- `expo-cicd-workflows` for `.eas/workflows/` YAML and EAS CI/CD schema validation.
+- `expo-deployment` for EAS Build, App Store, Play Store, TestFlight, web hosting, and submissions.
+- `eas-update-insights` for published EAS Update health, crash rates, launch/install counts, payload size, and rollout checks.
 
 ## Rules
 

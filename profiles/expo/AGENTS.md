@@ -6,12 +6,18 @@ Project-level instructions for Expo and React Native applications.
 
 - Treat Expo as the native runtime source of truth; do not apply web-only Next.js patterns.
 - Use `pnpm` for package scripts.
-- For Expo-compatible native packages, prefer `pnpm expo install <package>` so versions match the installed Expo SDK.
 - Respect the existing app architecture instead of forcing Expo Router, NativeWind, EAS, or a UI kit.
 - If Expo Router is already present, follow file-based routing conventions and use typed routes when configured.
 - If the project uses React Navigation directly, preserve that navigation model.
 - Prefer `app.config.ts` or `app.json` plus config plugins for native configuration.
 - With Continuous Native Generation or prebuild, avoid hand-editing `ios/` and `android/` unless the repo clearly owns native folders.
+
+## Expo SDK And Documentation
+
+- Detect the installed Expo SDK from the `expo` dependency in `package.json` before applying version-sensitive guidance.
+- Prefer Expo docs matching the installed SDK version; use latest docs only for upgrades, newly released features, or intentional SDK moves.
+- Do not install packages or use APIs that require a newer SDK unless the task is explicitly an SDK upgrade.
+- When Expo-generated project instructions point to SDK-specific docs, treat those references as authoritative for that project.
 
 ## Expo Skills
 
@@ -29,6 +35,14 @@ Project-level instructions for Expo and React Native applications.
 - Use `expo-cicd-workflows` for `.eas/workflows/` YAML, EAS CI/CD pipelines, and workflow schema validation.
 - Use `expo-deployment` for EAS Build, App Store, Play Store, TestFlight, web hosting, and production submission flows.
 - Use `eas-update-insights` for published EAS Update health, crash rates, launch/install counts, payload size, and OTA-vs-embedded rollout checks.
+
+## Dependencies And Native Compatibility
+
+- For Expo SDK and React Native packages, prefer `pnpm expo install <package>` so versions match the installed Expo SDK.
+- Use `pnpm expo install --check`, `pnpm expo install --fix`, or `pnpm dlx expo-doctor@latest` when dependency compatibility is uncertain.
+- Before adding native dependencies, check Expo Go/development-build constraints, config plugin needs, New Architecture compatibility, and whether a new development build is required.
+- For SDK 55 and later, assume the New Architecture is required and do not rely on legacy architecture behavior.
+- Avoid adding dependencies that increase native startup cost, app size, or build complexity unless the project clearly needs them.
 
 ## TypeScript And Structure
 
@@ -56,6 +70,21 @@ Project-level instructions for Expo and React Native applications.
 - Handle loading, empty, error, offline, and retry states in mobile-facing flows.
 - Be careful with app lifecycle, background/foreground transitions, permissions, and deep links.
 
+## Environment And Secrets
+
+- Treat every `EXPO_PUBLIC_*` variable as public because it is inlined into the client bundle.
+- Never put secrets, private API keys, tokens, signing credentials, or privileged URLs in `EXPO_PUBLIC_*` variables.
+- Use EAS environment variables/secrets, server-side API routes, or backend services for sensitive values.
+- When publishing EAS Updates, use the intended EAS environment so update bundles are built with the same public config as the matching build profile.
+
+## EAS Build And Update Safety
+
+- Before EAS Update work, check `runtimeVersion`, build channels, update branches, and whether native code, native config, or native dependencies changed.
+- Do not ship OTA updates for changes that require a new binary, including new native modules, config plugin changes, native permissions, native app config changes, or SDK upgrades.
+- Prefer staged rollouts for meaningful production updates and verify update health before increasing rollout percentage.
+- Use rollback or republish flows when a published update is unhealthy.
+- For store releases, prefer EAS remote app version management when the project already uses EAS Build and it fits the release process.
+
 ## Performance
 
 - Use `FlatList`, `SectionList`, or optimized list primitives for long lists.
@@ -74,9 +103,11 @@ Project-level instructions for Expo and React Native applications.
 
 ## Local Development And Verification
 
-- Prefer development builds for apps that depend on custom native modules or native configuration.
+- Prefer development builds for production-grade apps or apps that depend on custom native modules or native configuration.
 - Use Expo Go only when the project fits Expo Go constraints.
 - Use `pnpm expo start`, platform-specific simulator commands, and the repo's existing scripts for local validation.
-- Run `pnpm expo-doctor` or `npx expo-doctor@latest` when dependency compatibility is uncertain.
+- Run `pnpm dlx expo-doctor@latest` when dependency compatibility is uncertain.
+- Use `pnpm expo install --check` for immutable dependency checks in CI when appropriate.
 - Validate UI changes on a simulator, emulator, or device when the change affects native behavior.
+- Do not treat Expo Go as sufficient validation for production native behavior.
 - For tests, prefer the repo's existing Jest, React Native Testing Library, Maestro, Detox, or Expo test setup.

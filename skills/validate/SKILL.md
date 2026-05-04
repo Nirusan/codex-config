@@ -1,49 +1,44 @@
 ---
 name: validate
-description: Run lint, build, and E2E tests in sequence. Use when the user wants to validate their code, run tests, or check if everything works before committing.
+description: "Run full project validation using the repo's real scripts: lint, typecheck, build, and all relevant tests. Use when the user asks for full validation, a full test pass, or deeper merge/release confidence. Do not use for a quick pre-commit signal; use validate-quick for that, and use completion-verification before making readiness claims."
 ---
 
 # Full Project Validation
 
-Run all validation steps in order. Stop immediately if any step fails.
+Use this skill when a broad validation pass is needed, not just a quick health check.
 
-## Step 0: Detect Available Scripts
+## Workflow
 
-Check `package.json` to see which scripts are available:
-- Look for `lint`, `build`, `test:e2e`, `test` scripts
-- Adapt the workflow based on what exists
+1. Read the repo's validation guidance first:
+   - `AGENTS.md`
+   - `README.md`
+   - CI config if present
+   - `package.json` scripts
+2. Detect available scripts and prefer the repo's documented validation command when one exists.
+3. If no single documented command exists, run the applicable checks in this order:
+   - `pnpm lint`
+   - `pnpm typecheck`
+   - `pnpm build`
+   - unit or integration tests such as `pnpm test`, `pnpm test:unit`, or `pnpm test:integration`
+   - E2E tests such as `pnpm test:e2e`
+4. Run every distinct relevant test layer that exists.
+   - Do not treat unit tests as a fallback for E2E tests.
+   - If one script clearly wraps another, avoid duplicate runs and say why.
+5. Stop immediately on the first failure unless the user explicitly asks for a full failure inventory.
+6. Read the output and report only what actually ran.
 
-## Step 1: Lint (if available)
+## Rules
 
-```bash
-pnpm lint
-```
-- If script doesn't exist: skip with note
-- If errors: display them and offer to fix
-- If ok: proceed to next step
+- Use `pnpm`, not `npm` or `yarn`.
+- Skip missing scripts with a note; do not invent validation commands.
+- Prefer the repo's CI-equivalent command when it is clearly documented.
+- Do not claim the feature is ready based only on generic project validation; use `$completion-verification` for readiness claims.
 
-## Step 2: Build (if available)
+## Output
 
-```bash
-pnpm build
-```
-- If script doesn't exist: skip with note
-- If type errors: display them and offer to fix
-- If ok: proceed to next step
+Return a compact summary:
 
-## Step 3: Tests (if available)
-
-Check which test script exists and run it:
-- `pnpm test:e2e` (E2E tests)
-- `pnpm test` (unit tests fallback)
-- If neither exists: skip with note
-
-## Final Summary
-
-```
-Lint: [OK / X errors / Not configured]
-Build: [OK / X errors / Not configured]
-Tests: [OK (X passed) / X failed / Not configured]
-```
-
-Adapt to what's actually available in the project.
+- commands run
+- commands skipped and why
+- first failure, if any
+- what the result does and does not prove

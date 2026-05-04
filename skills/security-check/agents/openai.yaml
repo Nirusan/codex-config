@@ -1,0 +1,7 @@
+interface:
+  display_name: "Security Check"
+  short_description: "Audit security-sensitive code changes"
+  default_prompt: "Use $security-check to audit this security-sensitive change."
+
+policy:
+  allow_implicit_invocation: true

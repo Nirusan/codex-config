@@ -22,12 +22,17 @@ Use this skill to answer "what should we do next?" from actual project state.
 
 1. Read the best available plan and progress files.
 2. Follow the repo's existing planning structure rather than inventing a new one.
-3. Compare:
+3. Check lightweight repo reality before trusting trackers:
+   - `git status --short`
+   - recent commits or diffs when they are relevant to the active plan
+   - files touched for the current feature or story
+4. Compare:
    - remaining stories
    - current story
    - explicit blockers or dependencies
-4. Identify the next actionable task, not just the first unchecked line.
-5. If no plan exists, say so and recommend the appropriate planning step instead.
+   - evidence that tracked work is already done or stale
+5. Identify the next actionable task, not just the first unchecked line.
+6. If no plan exists, say so and recommend the appropriate planning step instead.
 
 ## Path resolution
 
@@ -60,5 +65,8 @@ Say so clearly and recommend the next sensible move, such as:
 
 Do not guess too hard. State the ambiguity and suggest:
 
+- `$refresh-context` if the repo state itself is unfamiliar
+- `$brainstorm` or `$prd` if the ambiguity is product-level
 - `$implementation-plan`
+- `$implement` if the next execution slice is clear after the status read
 - or a direct clarification question if that is the shortest path

@@ -64,6 +64,15 @@ Verify the allowed and denied paths, not just the happy path.
 
 Confirm the migration applies and the intended data path behaves correctly.
 
+### Commit / push / PR claim
+
+Verify the git state and review scope before saying work is safe to commit, push, or open as a PR:
+
+- `git status --short --branch`
+- staged diff or intended diff scope
+- current branch and remote target
+- relevant CI/check status when available
+
 ## Recommended companions
 
 - Use `$validate-quick` for a compact pass/fail health check.
@@ -77,6 +86,7 @@ Prefer concise evidence statements such as:
 - `pnpm build`: passed
 - original repro: no longer reproduces
 - UI check on desktop and mobile: matches expected behavior
+- git scope: staged diff contains only intended files
 - not verified: production-only webhook path
 
 ## If verification fails

@@ -1,58 +1,50 @@
 ---
 name: db-check
-description: Check Supabase database health, security advisors, and RLS policies. Use automatically after creating or modifying database migrations, RLS policies, or schema changes. Also use when working with Supabase tables or when security/performance issues are suspected.
+description: Check Supabase/Postgres database health, schema changes, migrations, RLS policies, grants, and advisors when available. Use after creating or modifying database migrations, RLS policies, schema, storage policies, or Supabase data paths. Do not rely on remote advisors alone; report clearly when live database access is unavailable.
 ---
 
-## Supabase Database Health Check
+# Database Check
 
-### Step 1: Identify Project
-Use `mcp__supabase__list_projects` to list available projects.
-Ask user to confirm if multiple projects are available.
+Use this skill to verify database changes with evidence, not just schema confidence.
 
-### Step 2: List Tables
-Use `mcp__supabase__list_tables` to see current schema.
+## Workflow
 
-### Step 3: Check Advisors
+1. Identify the database surface:
+   - changed migration files
+   - schema/types files
+   - RLS policies, grants, functions, triggers, storage policies
+   - application query or mutation paths touched by the change
+2. Check live Supabase access if MCP tools are available:
+   - list projects and resolve the intended project/ref
+   - list tables and policies
+   - run security and performance advisors
+3. If Supabase MCP tools are unavailable, do not dead-end.
+   - inspect local migrations and schema files
+   - use configured Supabase CLI or SQL access only if already available in the repo/environment
+   - report live checks as `not verified`
+4. For RLS or permission work, inspect policy semantics directly.
+   - allowed roles
+   - `using` and `with check` expressions
+   - ownership/team predicates
+   - service role or admin bypass paths
+5. For performance-sensitive changes, check indexes, foreign keys, query filters, pagination assumptions, and advisor output when available.
+6. If the change also touches app auth, API handlers, or query construction, use `$security-check` for the application layer.
 
-Run both security and performance checks:
+## Rules
 
-**Security:**
-- Use `mcp__supabase__get_advisors` with type="security"
-- Check for:
-  - Tables without RLS enabled
-  - Missing policies
-  - Exposed sensitive columns
+- Never say "No issues detected" unless the relevant live or local checks actually ran.
+- Distinguish `passed`, `failed`, `not configured`, and `not verified`.
+- Include project/ref, files inspected, commands/tools used, and advisor results when available.
+- Ask the user to choose only when multiple live projects are available and the target is not inferable.
 
-**Performance:**
-- Use `mcp__supabase__get_advisors` with type="performance"
-- Check for:
-  - Missing indexes
-  - Potential slow queries
-  - Large tables without pagination
+## Output
 
-### Step 4: Report
+Return a concise report:
 
-Display a structured report:
-```
-## Supabase Report - [Project name]
-
-### Tables (X total)
-- profiles (RLS: ✅)
-- opportunities (RLS: ✅)
-- responses (RLS: ❌ MISSING)
-
-### Security
-✅ No issues detected
-or
-⚠️ 2 issues detected:
-  1. [Description + remediation link]
-  2. [Description + remediation link]
-
-### Performance
-✅ No issues detected
-or
-⚠️ 1 issue detected:
-  1. [Description + remediation link]
-```
-
-Include remediation URLs provided by advisors.
+- scope inspected
+- live database access status
+- migrations/schema/policies reviewed
+- security findings
+- performance findings
+- checks not verified
+- recommended fixes or follow-up

@@ -1,69 +1,55 @@
 ---
 name: update-docs
-description: Intelligently update project documentation (AGENTS.md, memory-bank/) based on recent changes. Use after implementing features, establishing new patterns, or when documentation needs to reflect current state.
+description: Update durable project documentation after meaningful implementation work. Use when AGENTS.md, README, docs/, SKILL.md, design-system.md, or long-lived memory-bank context should reflect new patterns, integrations, setup, or behavior. Use update-progress instead for plan/progress trackers.
 ---
 
 # Update Project Documentation
 
-Update documentation **only if there are meaningful changes**.
+Update documentation only when the recent work creates durable information future sessions need.
 
 ## Scope
 
-1. `AGENTS.md` (project root)
-2. All files in `memory-bank/` **except** `brainstorm.md`
+Consider existing project docs such as:
 
-## Process
+- `AGENTS.md`
+- `README.md`
+- `docs/`
+- repo-root `SKILL.md`
+- `design-system.md`
+- durable `memory-bank/` context files
 
-### Step 1: Analyze Current State
+Do not use this skill for plan/progress trackers; use `$update-progress` instead.
 
-Read the current content of target files.
+## Workflow
 
-### Step 2: Identify Potential Updates
-
-Review recent work to identify:
-- New patterns or conventions established
-- New integrations or APIs added
-- New components or features implemented
-- Bug fixes that revealed important constraints
-- Updated validation rules or business logic
-- New environment variables required
-- Changes to project structure
-
-### Step 3: Evaluate Relevance
-
-**For AGENTS.md:**
-- Does this help future sessions understand the codebase?
-- Is this a reusable pattern or one-off implementation?
-- Would missing this information cause bugs or confusion?
-
-**DO NOT update if:**
-- The information is trivial or obvious
-- It duplicates existing content
-- It's too specific to one implementation detail
-- The existing documentation already covers it
-
-### Step 4: Apply Updates
-
-If relevant updates exist:
-1. Make minimal, focused edits
-2. Maintain existing formatting and style
-3. Keep AGENTS.md concise and scannable
-
-## Output Format
-
-```
-## Documentation Update Report
-
-### AGENTS.md
-- [Updated/No changes needed]
-- Changes: [list if any]
-
-### memory-bank/
-- [filename]: [Updated/No changes needed] - [reason]
-```
+1. Gather evidence from the actual change:
+   - `git diff` or staged diff
+   - files modified
+   - tests or validation output when relevant
+   - decisions or constraints that changed during implementation
+2. Identify docs that already describe the changed area.
+3. Decide whether an update is meaningful:
+   - new reusable pattern or convention
+   - new setup, dependency, integration, or environment variable
+   - changed user-facing behavior or operational flow
+   - bug fix that revealed a durable constraint
+   - validation or deployment rule future work must know
+4. Skip updates when the information is obvious, one-off, duplicative, speculative, or already covered.
+5. Apply minimal edits in the existing style.
 
 ## Rules
 
-- **Never** read or modify `memory-bank/brainstorm.md`
-- Prefer editing existing sections over adding new ones
-- Keep AGENTS.md under ~300 lines if possible
+- Never read or modify `memory-bank/brainstorm.md`.
+- Prefer updating existing sections over adding new docs.
+- Do not create a new documentation structure unless the repo already uses that pattern or the user asks.
+- Keep `AGENTS.md` concise and scannable.
+- Do not document unverified claims as facts.
+
+## Output
+
+Return a concise report:
+
+- docs inspected
+- docs updated
+- evidence used
+- no-op decisions and why

@@ -1,113 +1,58 @@
 ---
 name: security-check
-description: Red-team security audit for code changes. Use automatically when working on authentication, authorization, user inputs, API endpoints, database queries, or any security-sensitive code. Also use before commits that touch sensitive areas.
+description: Red-team security audit for code changes. Use automatically when working on authentication, authorization, user inputs, API endpoints, server actions, database queries, payments, webhooks, file uploads, storage, secrets, AI/tool execution, or other security-sensitive code. Also use before commits that touch sensitive areas.
 ---
 
-## Security Check - Red Team Audit
+# Security Check
 
-Act as a red-team penetration tester. Thoroughly investigate the current feature/code for security vulnerabilities, permission gaps, and attack vectors. Be paranoid and assume attackers are creative.
+Use this skill to audit the changed behavior like an attacker would, with evidence and clear uncertainty.
 
-### Security Audit Checklist
+## Workflow
 
-#### 1. Injection Vulnerabilities
-- [ ] SQL Injection (raw queries, string concatenation)
-- [ ] NoSQL Injection (MongoDB, Supabase filters)
-- [ ] Command Injection (shell commands, exec, spawn)
-- [ ] XSS (Cross-Site Scripting) - reflected, stored, DOM-based
-- [ ] Template Injection (server-side rendering)
-- [ ] Path Traversal (file access, `../` patterns)
+1. Define the scope from actual changes:
+   - `git diff` or staged diff
+   - touched files and routes/actions
+   - data flow from user input to persistence, external services, or privileged operations
+2. Identify trust boundaries:
+   - browser to server
+   - server actions or API routes
+   - database and RLS
+   - webhooks and third-party callbacks
+   - file/object storage
+   - AI tools, generated code, or command execution
+3. Review the relevant attack surfaces:
+   - injection: SQL/NoSQL, command, template, path traversal, SSRF
+   - XSS and unsafe HTML/Markdown rendering
+   - authentication, authorization, IDOR, privilege escalation
+   - CSRF, CORS, cookies, sessions, JWT handling
+   - OAuth redirects/callbacks and webhook signature verification
+   - file uploads, MIME/type checks, storage permissions, signed URLs
+   - secrets in code, logs, client bundles, URLs, or environment handling
+   - rate limits, abuse paths, mass assignment, verbose errors
+   - dependency/config risks and production debug exposure
+   - prompt injection, tool injection, and untrusted AI-generated actions
+4. For database schema, migrations, RLS, grants, or storage policies, use `$db-check` for the database layer.
+5. Verify realistic exploitability.
+   - compare allowed and denied paths
+   - inspect both client and server enforcement
+   - prefer concrete code evidence over checklist completion
+6. Report only what was inspected.
 
-#### 2. Authentication & Authorization
-- [ ] Missing authentication on sensitive routes
-- [ ] Broken access control (IDOR, privilege escalation)
-- [ ] JWT vulnerabilities (weak secrets, no expiry, algorithm confusion)
-- [ ] Session management issues
-- [ ] Missing CSRF protection on state-changing operations
-- [ ] Insecure password handling
+## Rules
 
-#### 3. Data Exposure
-- [ ] Hardcoded secrets, API keys, credentials
-- [ ] Sensitive data in logs
-- [ ] Excessive data in API responses
-- [ ] Missing input validation
-- [ ] Insecure direct object references
-- [ ] PII exposure in URLs or client-side storage
+- Include file paths and line numbers for findings.
+- Separate confirmed issues from risks, assumptions, and unverified areas.
+- Do not list a passed check unless you actually inspected the relevant code path.
+- Consider full attack chains, not only isolated vulnerabilities.
+- Provide actionable fixes with the smallest safe scope.
 
-#### 4. Database Security (if Supabase/DB present)
-- [ ] Missing RLS policies
-- [ ] Overly permissive RLS rules
-- [ ] Service role key exposed to client
-- [ ] Unvalidated user input in queries
+## Output
 
-#### 5. API Security
-- [ ] Missing rate limiting
-- [ ] No input sanitization
-- [ ] Verbose error messages leaking internals
-- [ ] Missing security headers (CSP, HSTS, X-Frame-Options)
-- [ ] CORS misconfiguration
-- [ ] Mass assignment vulnerabilities
+Return a concise report:
 
-#### 6. Dependencies & Config
-- [ ] Known vulnerabilities in dependencies (`pnpm audit`)
-- [ ] Outdated packages with security patches
-- [ ] Insecure default configurations
-- [ ] Debug mode enabled in production
-- [ ] Source maps exposed in production
-
-#### 7. Client-Side Security
-- [ ] Sensitive logic in client code
-- [ ] localStorage/sessionStorage with sensitive data
-- [ ] Eval or Function constructor usage
-- [ ] Prototype pollution risks
-- [ ] Clickjacking vulnerabilities
-
-### Methodology
-
-1. **Reconnaissance**: Understand the code structure and data flow
-2. **Threat Modeling**: Identify attack surfaces and entry points
-3. **Vulnerability Scanning**: Check each item systematically
-4. **Exploitation Analysis**: Assess real-world exploitability
-5. **Impact Assessment**: Rate severity (Critical/High/Medium/Low)
-
-### Output Format
-
-```
-## Security Audit Report
-
-**Scope:** [files/features analyzed]
-**Risk Level:** [Critical | High | Medium | Low]
-
-### Critical Issues (fix immediately)
-1. **[Vulnerability Type]** - `file:line`
-   - Description: ...
-   - Attack vector: ...
-   - Fix: ...
-
-### High Priority
-...
-
-### Medium Priority
-...
-
-### Low Priority / Recommendations
-...
-
-### Passed Checks
-- No SQL injection found
-- RLS properly configured
-- ...
-
-### Summary
-- X critical issues
-- X high priority
-- X medium priority
-- X recommendations
-```
-
-### Important
-
-- Be specific: include file paths, line numbers, and code snippets
-- Provide actionable fixes, not just descriptions
-- Consider the full attack chain, not isolated vulnerabilities
-- Check for defense in depth - one layer failing shouldn't compromise everything
-- Flag anything that "smells wrong" even if not immediately exploitable
+- scope inspected
+- evidence used: files, commands, logs, or flows
+- risk level: Critical, High, Medium, Low, or No confirmed issues
+- confirmed findings ordered by severity
+- unverified areas and why
+- recommended fixes or follow-up checks

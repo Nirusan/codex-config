@@ -27,7 +27,7 @@ Use this skill when you need a fast confidence signal, not a full QA pass.
    - `pnpm typecheck`
    - `pnpm build` only when no lighter structural check exists or build is the repo's real fast gate
 3. Run at most the minimum needed to produce a credible quick signal.
-4. Return compact pass/fail output only.
+4. Return compact pass/fail output with the exact commands run and skipped.
 
 ## Output format
 
@@ -49,4 +49,5 @@ Use this skill when you need a fast confidence signal, not a full QA pass.
 
 - No long error dump; use `$validate` for detailed output.
 - Do not pretend this replaces task-specific verification.
+- Do not imply skipped checks passed.
 - If the repo's only meaningful gate is heavier, say so plainly.

@@ -39,11 +39,14 @@ Use this skill when isolation will reduce risk or confusion before implementatio
    - otherwise, prefer a project-local `.worktrees/<branch-name>` directory
    - only use a sibling directory when the repo already uses that style or the user asks for it
 4. If you use a project-local `.worktrees/` directory, verify it is ignored with `git check-ignore -q .worktrees`.
-5. If `.worktrees/` is not ignored, add the minimal ignore rule needed before creating the worktree.
-   - Do not auto-commit that ignore change unless the user asks or the repository workflow clearly expects it.
-6. Choose the base branch deliberately:
+5. If `.worktrees/` is not ignored, do not mutate the current checkout just to set up isolation.
+   - ask before adding an ignore rule, or choose a non-mutating location that follows an existing safe convention
+   - do not auto-commit ignore changes unless the user asks or the repository workflow clearly expects it
+6. Resolve the base branch deliberately:
    - use the user-specified base branch when given
-   - use fresh `main` or `origin/main` for new work unless continuing an existing feature branch is clearly the right move
+   - detect the repository default branch instead of assuming `main`
+   - fetch remote refs when freshness matters and network access is available
+   - use fresh default branch or `origin/<default-branch>` for new work unless continuing an existing feature branch is clearly the right move
    - use the current feature branch when the task is explicitly a continuation of that branch
 7. Create the worktree and switch into it.
 8. Run only the setup the repo actually needs:
@@ -62,6 +65,7 @@ Use this skill when isolation will reduce risk or confusion before implementatio
 - Prefer one clear convention per repository; do not create a new directory pattern casually.
 - Never create stray temporary directories with random suffixes when a repo-local `.worktrees/` folder would do.
 - If the baseline check fails, stop and report that clearly before implementing changes.
+- If you cannot confirm the base branch is fresh, report that instead of implying a fresh baseline.
 - Never delete existing worktrees blindly. If cleanup is needed, verify they are not active and ask before removing anything important.
 - If the current repo already has a better convention than the default, follow the repo, not the generic rule.
 

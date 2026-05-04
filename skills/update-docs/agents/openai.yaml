@@ -1,0 +1,7 @@
+interface:
+  display_name: "Update Docs"
+  short_description: "Refresh durable project documentation"
+  default_prompt: "Use $update-docs to refresh durable project documentation after this change."
+
+policy:
+  allow_implicit_invocation: true

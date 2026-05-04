@@ -1,0 +1,7 @@
+interface:
+  display_name: "Database Check"
+  short_description: "Verify database schema and RLS changes"
+  default_prompt: "Use $db-check to verify the database schema and RLS changes."
+
+policy:
+  allow_implicit_invocation: true

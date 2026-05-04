@@ -68,7 +68,7 @@ Do not patch symptoms first. Understand the failure path first.
 - use the browser directly before editing
 - inspect console, network, screenshots, and visible state
 - compare what the user sees to what the code assumes
-- use `$dev-browser` when a live browser check is useful
+- use Browser Use / the Codex in-app browser when a live browser check is useful, with `$dev-browser` as a fallback if Browser Use is unavailable or insufficient
 
 ### Auth, permissions, and security-sensitive flows
 

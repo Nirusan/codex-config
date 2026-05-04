@@ -1,16 +1,17 @@
 # Configuration Codex
 
-Configuration Codex personnelle pour une expérience de dev cohérente sur toutes tes machines.
+Configuration Codex personnelle pour garder une expérience de dev cohérente sur toutes tes machines et tes stacks.
 
-> ⚠️ **Attention** : Cette installation **écrase** ta configuration `~/.codex/`. Une sauvegarde est créée dans `~/.codex-backup-YYYYMMDD-HHMMSS/`.
+> Attention : l'installation niveau utilisateur met à jour `~/.codex/`. Une sauvegarde est créée dans `~/.codex-backup-YYYYMMDD-HHMMSS/`. Les installations de profils projet conservent le contenu humain de `AGENTS.md` hors blocs balisés.
 
 ## Prérequis
 
-- **git** - pour cloner et synchroniser
-- **curl** - pour l'installation en one-liner
+- **git** - cloner et synchroniser
+- **curl** - installation one-liner
 - **bash** - shell (macOS/Linux/WSL)
+- **python3** - mise à jour idempotente des profils projet
 
-## Installation rapide
+## Installation Rapide
 
 ### Niveau utilisateur (tous les projets de la machine)
 
@@ -24,100 +25,129 @@ cd codex-config
 ./install.sh --user
 ```
 
-### Niveau projet (uniquement le projet courant)
+### Profils niveau projet
 
 ```bash
-# One-liner
+# Config projet neutre
 curl -sSL https://raw.githubusercontent.com/Nirusan/codex-config/main/install.sh | bash -s -- --project
 
-# Ou via clone
-git clone https://github.com/Nirusan/codex-config.git /tmp/codex-config
-cd /path/to/your/project
-/tmp/codex-config/install.sh --project
+# Profil projet Next.js
+curl -sSL https://raw.githubusercontent.com/Nirusan/codex-config/main/install.sh | bash -s -- --project --profile next
+
+# Profil projet Expo / React Native
+curl -sSL https://raw.githubusercontent.com/Nirusan/codex-config/main/install.sh | bash -s -- --project --profile expo
 ```
 
-## Modes d’installation
+Depuis un clone local :
+
+```bash
+git clone https://github.com/Nirusan/codex-config.git /tmp/codex-config
+cd /path/to/your/project
+/tmp/codex-config/install.sh --project --profile next
+```
+
+Le mode one-liner récupère une copie temporaire complète du repo avant l'installation. Les ressources imbriquées des skills, comme `agents/`, `scripts/`, `references/` et `assets/`, sont donc préservées comme avec une installation depuis clone local.
+
+Pour un monorepo, cible un dossier d'app précis :
+
+```bash
+/tmp/codex-config/install.sh --project --profile next --target apps/web
+/tmp/codex-config/install.sh --project --profile expo --target apps/mobile
+```
+
+## Modes D'installation
 
 | Mode | Flag | Cible | Usage |
 |------|------|-------|-------|
-| **User** | `--user` (par défaut) | `~/.codex/` | Machine perso, tous projets |
-| **Project** | `--project` | `./.codex/` + `./AGENTS.md` | Config d’équipe, règles par repo |
+| User | `--user` (par défaut) | `~/.codex/` | Machine perso, tous projets |
+| Project | `--project` | `./.codex/` + `./AGENTS.md` | Config neutre d'équipe ou de repo |
+| Project profile | `--project --profile next\|expo` | `.codex/` cible + bloc profil dans `AGENTS.md` | Qualité spécifique à une stack |
 
-### Options
+Options :
 
 | Flag | Description |
 |------|-------------|
-| `--yes` ou `-y` | Ignorer la confirmation (CI/Docker) |
+| `--yes` ou `-y` | Ignorer la confirmation |
+| `--profile next` | Appliquer ou rafraîchir le profil Codex Next.js |
+| `--profile expo` | Appliquer ou rafraîchir le profil Codex Expo / React Native |
+| `--target path` | Appliquer la config projet à un dossier précis |
 
----
+Overrides pour source distante :
+
+| Env var | Description |
+|---------|-------------|
+| `SOURCE_REPO_URL` | Repo Git utilisé par les installations one-liner distantes |
+| `SOURCE_BRANCH` | Branche à cloner ou télécharger, par défaut `main` |
+| `ARCHIVE_URL` | Tarball de fallback si Git clone n'est pas disponible |
+
+## Profils Projet
+
+Ce repo utilise une configuration en couches :
+
+- `config/AGENTS.md` est le socle global neutre.
+- `profiles/next/AGENTS.md` contient les règles Next.js / React web.
+- `profiles/expo/AGENTS.md` contient les règles Expo / React Native.
+- `scripts/apply-profile.py` insère ou rafraîchit un bloc profil dans le `AGENTS.md` projet.
+
+Les installations de profil sont idempotentes et préservent tout ce qui est hors marqueurs :
+
+```md
+<!-- codex-profile:next:start -->
+...
+<!-- codex-profile:next:end -->
+```
+
+```md
+<!-- codex-profile:expo:start -->
+...
+<!-- codex-profile:expo:end -->
+```
+
+Dans Codex, utilise `$setup-next` ou `$setup-expo` pour appliquer le bon profil et obtenir un audit court de la config projet.
 
 ## Contenu
 
-### Instructions globales
+### Instructions Globales
 
-- `config/AGENTS.md` → `~/.codex/AGENTS.md` (ou `./AGENTS.md` en mode projet)
-- Conventions TypeScript/Next.js/nommage/style
-- Réponses en français, code/docs en anglais
+- Conventions neutres TypeScript, nommage, style, validation, docs et routing de skills
+- Réponses en français, code/docs/config interne en anglais
+- Règles spécifiques aux stacks sorties du socle global
 
 ### Configuration Codex
 
-- `config/config.example.toml` → `~/.codex/config.toml` (ou `./.codex/config.toml`)
-- Modèle public-safe uniquement : aucune vraie clé API ni chemin de projet personnel n'est versionné dans ce repo
-- Modèle, approbations, sandbox, web search
-- MCP servers (OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, n8n)
-- Automation navigateur via la skill/CLI `dev-browser` plutôt qu’un browser MCP
+- `config/config.example.toml` -> `~/.codex/config.toml` ou `./.codex/config.toml`
+- Template public-safe uniquement : aucune vraie clé API ni chemin personnel
+- MCP servers pour OpenAI Docs, Context7, Brave, Firecrawl, Supabase, Exa, n8n
+- Automation navigateur via la skill/CLI `dev-browser` plutôt qu'un browser MCP
 
 ### Skills
 
-Les skills sont dans `skills/` et sont installés dans `~/.codex/skills/` ou `./.codex/skills/`.
-
 Workflow principal :
-- `refresh-context` → retrouver rapidement l’état d’un projet avant de reprendre
-- `brainstorm` → transformer une idée floue en brief produit concret
-- `prd` → écrire les requirements et le scope
-- `tech-stack` → traduire les requirements en architecture
-- `implementation-plan` → découper le travail en stories implémentables
-- `next-task` → choisir le prochain morceau actionnable
-- `implement` → exécuter l’unité de travail suivante
-- `update-progress` → refléter ce qui a réellement été terminé
+- `refresh-context` -> retrouver rapidement l'état d'un projet avant de reprendre
+- `brainstorm`, `prd`, `tech-stack`, `implementation-plan` -> transformer une idée en plan buildable
+- `next-task`, `implement`, `update-progress` -> choisir, exécuter et documenter le travail
+- `setup-next`, `setup-expo` -> appliquer et auditer les profils projet par stack
 
-Debug, validation et qualité de livraison :
-- `systematic-debugging` → debug orienté root cause pour les bugs flous ou flaky
-- `validate` / `validate-quick` → validation complète ou rapide
-- `completion-verification` → exiger une preuve fraîche avant d’annoncer que c’est prêt
-- `validate-update-push` → wrap-up guidé de fin de tâche
-- `git-add-commit-push` → finalisation Git explicite, uniquement quand tu la veux vraiment
+Debug, validation et livraison :
+- `systematic-debugging` -> debug orienté root cause
+- `validate`, `validate-quick`, `completion-verification` -> checks de readiness
+- `validate-update-push`, `git-add-commit-push` -> workflows de fin explicites
 - `security-check`, `db-check`, `seo-check`
 
 Design et UI :
-- `design-director` → cadrer une direction visuelle avant de construire
-- `design-principles` → contraintes de design précises pour apps/dashboards
-- `frontend-skill` → guide complémentaire pour composition, hiérarchie et retenue
-- `taste-skill` → base premium pour générer une nouvelle UI frontend
-- `redesign-skill` → auditer puis améliorer une interface existante
-- `minimalist-skill` → surfaces produit plus calmes et éditoriales
-- `soft-skill` → langage visuel plus doux et plus luxueux
-- `output-skill` → pousse vers des sorties complètes sans placeholders
-- `responsive-frontend-designs` → implémenter une UI depuis des screenshots ou références
-- `dev-browser` → automation navigateur et validation visuelle
-- `browser-based-games` → planifier et construire des jeux navigateur
+- `design-director`, `design-principles`, `frontend-skill`
+- `taste-skill`, `redesign-skill`, `minimalist-skill`, `soft-skill`, `output-skill`
+- `responsive-frontend-designs`, `dev-browser`, `browser-based-games`
 
 Workflow frontend recommandé :
-- Garde Gemini Design hors de la config par défaut. Utilise `gemini-design-mcp` uniquement quand tu veux explicitement cet outil dans un repo précis.
-- Préfère `design-director` pour clarifier la direction, puis construis avec les skills frontend installées globalement.
-- Utilise la famille Taste Skill comme couche principale d’exécution esthétique pour le frontend dans cette config.
-- Garde `frontend-skill` comme guide complémentaire pour la composition de layout, la hiérarchie, l’enchaînement des sections et la retenue.
-- Ne traite pas `taste-skill` et `frontend-skill` comme deux copilotes égaux du même passage : Taste mène, `frontend-skill` relit la composition ensuite.
-- Laisse un `SKILL.md` local de Taste Skill ajouter des overrides spécifiques à un projet quand c’est utile.
-- Bon mapping : `taste-skill` pour une nouvelle UI premium, `redesign-skill` pour une refonte, `minimalist-skill` pour des surfaces produit plus calmes, `output-skill` quand tu veux des sorties entièrement développées.
+- Garder Gemini Design hors de la config par défaut sauf demande explicite.
+- Appliquer `$setup-next` pour les projets Next.js sérieux et `$setup-expo` pour les projets Expo / React Native sérieux.
+- Utiliser Taste Skill comme couche principale d'exécution esthétique et `frontend-skill` comme check secondaire de composition.
+- Laisser les `SKILL.md` locaux ajouter les overrides spécifiques au projet.
 
-Utilitaires :
-- `update-docs`, `sync-config`, `permissions-allow`, `humanizer`
+## Setup Automation Navigateur
 
-### Setup automation navigateur
-
-Ce repo utilise `dev-browser` pour l’automation navigateur en live au lieu d’un browser MCP.
-`./install.sh` installe automatiquement la version vendoriée de [skills/dev-browser/SKILL.md](/Users/nirusan/Sites/codex-config/skills/dev-browser/SKILL.md) dans le dossier de skills Codex.
+Ce repo utilise `dev-browser` pour l'automation navigateur live.
 
 ```bash
 pnpm add -g dev-browser
@@ -125,34 +155,7 @@ dev-browser install
 dev-browser --help
 ```
 
-Installation manuelle au format Amp/Codex, si tu veux récupérer la skill upstream directement :
-
-```bash
-SKILLS_DIR=~/.codex/skills
-mkdir -p "$SKILLS_DIR"
-git clone https://github.com/sawyerhood/dev-browser /tmp/dev-browser-skill
-cp -r /tmp/dev-browser-skill/skills/dev-browser "$SKILLS_DIR/dev-browser"
-rm -rf /tmp/dev-browser-skill
-```
-
-### Comment les skills s’activent
-
-Les skills peuvent être utilisées de deux façons :
-
-- **Activation implicite** : Codex peut choisir automatiquement une skill si la demande correspond clairement à sa description.
-- **Activation explicite** : tu peux appeler une skill directement avec `$nom-de-la-skill`, par exemple `$systematic-debugging` ou `$completion-verification`.
-
-Ce repo garde volontairement certaines skills plus sensibles en **explicite uniquement**, notamment :
-- `git-add-commit-push`
-- `validate-update-push`
-
-Pour le design, cette config traite maintenant la famille Taste Skill comme une partie du socle frontend global, tout en gardant les `SKILL.md` locaux comme meilleur endroit pour des contraintes spécifiques à un projet.
-
-Ça permet de garder l’aide quotidienne fluide sans déclencher des actions Git ou de release par accident.
-
----
-
-## Mise à jour
+## Mise A Jour
 
 ```bash
 cd /path/to/codex-config
@@ -160,22 +163,16 @@ git pull
 ./install.sh
 ```
 
-## Synchroniser la config locale vers le repo
+## Synchroniser La Config Locale Vers Le Repo
 
 ```bash
 cd /path/to/codex-config
 ./sync.sh
 ```
 
-`./sync.sh` met à jour `config/config.example.toml`, pas ton vrai `config.toml` local. Relis toujours le template généré avant commit pour vérifier qu'il ne contient que des placeholders.
+`./sync.sh` met à jour `config/config.example.toml`, synchronise les dossiers complets des skills, et synchronise aussi `profiles/` plus `scripts/apply-profile.py` quand ils existent dans `~/.codex/`. Relis la config générée avant commit.
 
-`./sync.sh` synchronise aussi les dossiers complets des skills, y compris les fichiers annexes :
-- `agents/openai.yaml`
-- `scripts/`
-- `references/`
-- `assets/`
-
-## Structure du repo
+## Structure Du Repo
 
 ```text
 codex-config/
@@ -186,28 +183,22 @@ codex-config/
 ├── config/
 │   ├── AGENTS.md
 │   └── config.example.toml
+├── profiles/
+│   ├── next/
+│   │   └── AGENTS.md
+│   └── expo/
+│       └── AGENTS.md
+├── scripts/
+│   └── apply-profile.py
 └── skills/
-    ├── brainstorm/
+    ├── setup-next/
     │   ├── SKILL.md
     │   └── agents/openai.yaml
-    ├── completion-verification/
-    │   ├── SKILL.md
-    │   └── agents/openai.yaml
-    ├── dev-browser/
-    │   ├── SKILL.md
-    │   └── agents/openai.yaml
-    ├── responsive-frontend-designs/
-    │   └── SKILL.md
-    ├── systematic-debugging/
-    │   ├── SKILL.md
-    │   └── agents/openai.yaml
-    ├── worktree-setup/
+    ├── setup-expo/
     │   ├── SKILL.md
     │   └── agents/openai.yaml
     └── ...
 ```
-
----
 
 ## Licence
 

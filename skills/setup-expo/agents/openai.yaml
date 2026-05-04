@@ -1,0 +1,7 @@
+interface:
+  display_name: "Setup Expo"
+  short_description: "Apply and audit the Expo Codex profile"
+  default_prompt: "Use $setup-expo to configure this project for high-quality Expo and React Native work."
+
+policy:
+  allow_implicit_invocation: true

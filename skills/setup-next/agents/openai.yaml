@@ -1,0 +1,7 @@
+interface:
+  display_name: "Setup Next"
+  short_description: "Apply and audit the Next.js Codex profile"
+  default_prompt: "Use $setup-next to configure this project for high-quality Next.js work."
+
+policy:
+  allow_implicit_invocation: true

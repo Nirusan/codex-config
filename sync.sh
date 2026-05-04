@@ -112,6 +112,23 @@ PY
   echo "    ✓ config/config.example.toml"
 fi
 
+# Sync project profiles
+if [[ -d "$CODEX_DIR/profiles" ]]; then
+  mkdir -p "$SCRIPT_DIR/profiles"
+  rsync -a --delete \
+    --exclude '.DS_Store' \
+    "$CODEX_DIR/profiles/" "$SCRIPT_DIR/profiles/"
+  echo "    ✓ profiles/"
+fi
+
+# Sync reusable helper scripts
+if [[ -f "$CODEX_DIR/scripts/apply-profile.py" ]]; then
+  mkdir -p "$SCRIPT_DIR/scripts"
+  cp "$CODEX_DIR/scripts/apply-profile.py" "$SCRIPT_DIR/scripts/apply-profile.py"
+  chmod +x "$SCRIPT_DIR/scripts/apply-profile.py"
+  echo "    ✓ scripts/apply-profile.py"
+fi
+
 # Sync skills (preserve nested folders like agents/, scripts/, references/, assets/)
 if [[ -d "$CODEX_DIR/skills" ]]; then
   mkdir -p "$SCRIPT_DIR/skills"

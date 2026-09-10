@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $implement to execute the next concrete chunk of work in this repo."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

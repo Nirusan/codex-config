@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $update-progress to sync the tracker with the work that was just completed."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

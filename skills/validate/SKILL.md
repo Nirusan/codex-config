@@ -1,44 +1,14 @@
 ---
 name: validate
-description: "Run full project validation using the repo's real scripts: lint, typecheck, build, and all relevant tests. Use when the user asks for full validation, a full test pass, or deeper merge/release confidence. Do not use for a quick pre-commit signal; use validate-quick for that, and use completion-verification before making readiness claims."
+description: Run comprehensive repository validation when explicitly requested or required by the repository's completion gate. Skip for a narrow confidence check that does not require the full suite.
 ---
 
-# Full Project Validation
+# Run repository validation
 
-Use this skill when a broad validation pass is needed, not just a quick health check.
+1. Find the actual validation contract in applicable instructions, package scripts, and CI. Identify the required commands and prerequisites for this change; do not invent lint, build, test, or end-to-end scripts.
+2. Use the repository's umbrella command when it covers those checks, with pnpm for JavaScript packages. Add required checks it does not cover. Avoid running the same layer both directly and through a wrapper.
+3. Run checks in dependency order. Independent checks may run concurrently when they do not compete for shared services or outputs. A prerequisite failure blocks its dependents; continue independent checks when useful for the requested validation.
+4. For failures, identify the command and actionable cause. Fix within the authorized scope, then rerun the affected checks and any dependent checks whose evidence is invalidated.
+5. Report passed, failed, and unavailable checks, including any required coverage still missing.
 
-## Workflow
-
-1. Read the repo's validation guidance first:
-   - `AGENTS.md`
-   - `README.md`
-   - CI config if present
-   - `package.json` scripts
-2. Detect available scripts and prefer the repo's documented validation command when one exists.
-3. If no single documented command exists, run the applicable checks in this order:
-   - `pnpm lint`
-   - `pnpm typecheck`
-   - `pnpm build`
-   - unit or integration tests such as `pnpm test`, `pnpm test:unit`, or `pnpm test:integration`
-   - E2E tests such as `pnpm test:e2e`
-4. Run every distinct relevant test layer that exists.
-   - Do not treat unit tests as a fallback for E2E tests.
-   - If one script clearly wraps another, avoid duplicate runs and say why.
-5. Stop immediately on the first failure unless the user explicitly asks for a full failure inventory.
-6. Read the output and report only what actually ran.
-
-## Rules
-
-- Use `pnpm`, not `npm` or `yarn`.
-- Skip missing scripts with a note; do not invent validation commands.
-- Prefer the repo's CI-equivalent command when it is clearly documented.
-- Do not claim the feature is ready based only on generic project validation; use `$completion-verification` for readiness claims.
-
-## Output
-
-Return a compact summary:
-
-- commands run
-- commands skipped and why
-- first failure, if any
-- what the result does and does not prove
+Completed checks can satisfy the gate while the relevant source and environment remain unchanged. An explicit request to rerun takes precedence. Do not install unrelated tooling, deploy, reset databases, or change production as a validation side effect; use an appropriate local or already authorized environment.

@@ -3,3 +3,14 @@
 .codex-backup-*
 .foo/
 config/config.toml
+__pycache__/
+skills/mintdex-news-carousel/
+skills/mintdex-price-completeness/
+skills/mintdex-social-publishing/
+skills/**/data/journal-entries.json
+skills/**/data/invoices/*
+!skills/**/data/invoices/_template.json
+skills/**/company.json
+skills/**/copros.json
+skills/**/.env
+skills/**/.env.*

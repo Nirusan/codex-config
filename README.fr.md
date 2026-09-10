@@ -145,11 +145,12 @@ Skills compagnons Expo :
 - Data, serveur et styling : `native-data-fetching`, `expo-api-routes`, `expo-tailwind-setup`
 - Release et opérations : `upgrading-expo`, `expo-cicd-workflows`, `expo-deployment`, `eas-update-insights`
 
-Workflow frontend recommandé :
-- Garder Gemini Design hors de la config par défaut sauf demande explicite.
-- Appliquer `$setup-next` pour les projets Next.js sérieux et `$setup-expo` pour les projets Expo / React Native sérieux.
-- Utiliser Taste Skill comme couche principale d'exécution esthétique et `frontend-skill` comme check secondaire de composition.
-- Laisser les `SKILL.md` locaux ajouter les overrides spécifiques au projet.
+Sélection des skills :
+- Conserver le design system du projet. Choisir une direction visuelle sur demande, sans imposer plusieurs procédures à une retouche ordinaire.
+- Garder Gemini Design hors de la configuration par défaut sauf demande explicite.
+- Utiliser `$setup-next` ou `$setup-expo` pour un audit de configuration demandé. Les profils intégrés au projet sont préservés.
+- Les helpers génériques et styles optionnels restent disponibles par invocation explicite ; les skills spécialisés utilisent des déclencheurs ciblés.
+- `config/skills-manifest.txt` liste les skills distribuables. Les skills privés supplémentaires restent installés localement et ne sont pas exportés automatiquement.
 
 ## Setup Automation Navigateur
 
@@ -176,7 +177,9 @@ cd /path/to/codex-config
 ./sync.sh
 ```
 
-`./sync.sh` met à jour `config/config.example.toml`, synchronise les dossiers complets des skills, et synchronise aussi `profiles/` plus `scripts/apply-profile.py` quand ils existent dans `~/.codex/`. Relis la config générée avant commit.
+`./sync.sh` copie les instructions, profils, helpers et ressources distribuables des skills autorisés par le manifest du dépôt de destination. `--source <dossier>` sélectionne une autre configuration personnelle. Un manifest personnel plus large n'ajoute aucun skill à cette liste publique ; les fichiers non gérés sont préservés.
+
+La configuration privée `config.toml` n'est jamais exportée et le modèle public `config/config.example.toml` reste inchangé. La synchronisation ne prépare aucun commit et ne publie rien. L'installation conserve les réglages existants et sauvegarde les instructions et ressources concernées ; les détails à jour figurent dans le README anglais.
 
 ## Structure Du Repo
 

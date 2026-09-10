@@ -1,34 +1,16 @@
 ---
 name: sync-config
-description: Sync local Codex config (AGENTS.md, a public-safe config template, and full skill directories) to this repo.
+description: Copy personal Codex instructions and complete skill resources into the configuration repository for review.
 ---
 
-# Sync Codex Configuration
+# Sync configuration
 
-Sync your local `~/.codex/` config to the GitHub repo.
+Locate the configuration checkout and inspect its status before copying. Preserve unrelated edits and use an owned worktree if this repository requires isolation or the target paths overlap another task. Run its `sync.sh --source <personal-configuration-directory>` when selecting a source explicitly.
 
-## Steps
+Before execution, inspect the selected `sync.sh` and its copy helper: these instructions describe the reviewed version with a destination allowlist and runtime-data exclusions. If it exports private `config.toml` or runtime data, expands scope from the personal manifest, or stages/commits/pushes automatically, do not run it. Use the reviewed updated script from the configuration worktree or perform only the scoped instruction/resource copy directly. A new skill body does not upgrade an older repository script by itself.
 
-1. Run the sync script:
-```bash
-cd ~/Sites/codex-config && ./sync.sh
-```
+The destination repository's `config/skills-manifest.txt` is the publication allowlist. Sync only its listed skills, including invocation policies and distributable resources, plus AGENTS, profiles and instruction helpers. A larger personal manifest must never expand this scope. Private project skills and runtime data remain local; preserve unlisted files. Add a skill to the repository manifest only after reviewing every resource for public distribution. Do not silently reinstate retired entries.
 
-2. Review changes:
-```bash
-cd ~/Sites/codex-config && git status && git diff
-```
+Local `config.toml` is never exported. Keep the public example curated with placeholders; inspect any requested template edit for secrets and personal paths. Do not read or print credential values for an instruction sync.
 
-3. If changes look good, commit and push:
-```bash
-cd ~/Sites/codex-config && git add -A && git commit -m "sync: update config" && git push
-```
-
-## Notes
-
-- This syncs:
-  - `AGENTS.md`
-  - `config/config.example.toml` generated from your local `config.toml` with placeholders instead of real secrets
-  - full `skills/<name>/` directories, including nested `agents/`, `scripts/`, `references/`, and `assets/`
-- The real local `config.toml` must never be committed to this public repo
-- Review the generated `config/config.example.toml` before pushing to confirm it contains placeholders only
+Review exact changed paths. Sync alone authorizes no staging, commit or push. If publication is explicitly requested, stage only the audited intended paths and use the user's scoped commit/push authority. Never use `git add -A` on a dirty configuration checkout.

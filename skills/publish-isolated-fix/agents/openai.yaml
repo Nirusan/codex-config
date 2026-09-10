@@ -1,0 +1,4 @@
+interface:
+  display_name: "Publish Isolated Fix"
+  short_description: "Push a small scoped fix safely"
+  default_prompt: "Use $publish-isolated-fix to publish only a small scoped fix with a safe PR flow."

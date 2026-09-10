@@ -2,14 +2,14 @@
 
 Personal Codex configuration for a consistent development experience across machines and stacks.
 
-> Warning: user-level installation updates `~/.codex/`. A backup is created at `~/.codex-backup-YYYYMMDD-HHMMSS/` before installation. Project profile installs preserve human-written `AGENTS.md` content outside marked profile blocks.
+> Warning: user-level installation updates `~/.codex/`. An instruction/resource backup is created at a unique `~/.codex-backup-YYYYMMDD-HHMMSS-XXXXXX/` path before installation; sessions and logs are excluded. Existing `config.toml` settings are preserved. Project profile installs preserve human-written `AGENTS.md` content outside marked profile blocks.
 
 ## Prerequisites
 
 - **git** - cloning and syncing
 - **curl** - one-liner install
 - **bash** - shell (macOS/Linux/WSL)
-- **python3** - idempotent project profile updates
+- **python3 (3.9+)** - resource validation/copying and idempotent project profile updates
 
 ## Quick Install
 
@@ -46,7 +46,7 @@ cd /path/to/your/project
 /tmp/codex-config/install.sh --project --profile next
 ```
 
-The one-liner mode fetches a complete temporary copy of this repo before installing, so nested skill resources such as `agents/`, `scripts/`, `references/`, and `assets/` are preserved just like a local clone install.
+The one-liner mode fetches a complete temporary copy of this repo before installing. The shared `scripts/copy-resources.py` helper preserves nested skill resources such as `agents/`, `scripts/`, `references/`, and `assets/`, including executable permissions. Both installation paths use the same preflight and resource filters.
 
 For monorepos, target a specific app folder:
 
@@ -109,7 +109,7 @@ Use `$setup-next` or `$setup-expo` inside Codex to apply the matching profile an
 
 ### Global Instructions
 
-- Neutral TypeScript, naming, style, validation, docs, and skill-routing conventions
+- Compact cross-project preferences and evidence/authorization boundaries; task-specific instructions stay in project references
 - French responses, English code/docs/internal config
 - Stack-specific rules kept out of the global baseline
 
@@ -145,11 +145,12 @@ Expo companion skills:
 - Data, server, and styling: `native-data-fetching`, `expo-api-routes`, `expo-tailwind-setup`
 - Release and operations: `upgrading-expo`, `expo-cicd-workflows`, `expo-deployment`, `eas-update-insights`
 
-Recommended frontend workflow:
-- Keep Gemini Design out of the default config unless explicitly requested.
-- Apply `$setup-next` for serious Next.js projects and `$setup-expo` for serious Expo / React Native projects.
-- Use Taste Skill as the primary aesthetic execution layer and `frontend-skill` as a secondary composition check.
-- Let repo-local `SKILL.md` files add project-specific overrides.
+Skill selection:
+- Keep the existing project design authoritative. Choose a style skill when that direction is requested; do not stack several design procedures for a routine UI change.
+- Generic workflow helpers and optional styles/tools remain available by explicit `$skill-name` invocation. Their `agents/openai.yaml` sets `allow_implicit_invocation: false` so they do not consume routine skill catalogue context.
+- Specialized automatic skills use narrow task triggers. The manifest `config/skills-manifest.txt` lists all installable directories, including nested resources; it is independent of invocation policy.
+- The installer preserves unknown local skills. Remove or retire a directory only after auditing its callers and retaining a recoverable copy.
+- Project profiles are compact; `apply-profile.py --check` previews changes. A `codex-profile:<name>:integrated` marker preserves equivalent project-maintained guidance instead of appending a duplicate.
 
 ## Browser Automation Setup
 
@@ -176,7 +177,15 @@ cd /path/to/codex-config
 ./sync.sh
 ```
 
-`./sync.sh` updates `config/config.example.toml`, syncs full skill directories, and also syncs `profiles/` plus `scripts/apply-profile.py` when present in `~/.codex/`. Review generated config before committing.
+`./sync.sh` requires this destination repository's `config/skills-manifest.txt` and copies only its listed skill directories, plus instructions, profiles, and both Python helpers. This public allowlist is never replaced by a personal source manifest. Use `--source <directory>` for another configuration source. Personal skill overlays and other unlisted source/destination files remain in place; adding a skill to the public allowlist requires an intentional review. The script never stages, commits or pushes.
+
+Both scripts validate all selected sources and managed destinations before changing target files. Internal source links are materialized as regular content within the same skill/profile directory; links to sibling skills, external paths, excluded files, dangling targets, and cycles are refused. Global source `AGENTS.md` must itself be a regular file. Existing links in managed destinations are always refused, including internal links left by older installs. For that migration, first back up the exact links and verify their intended in-directory targets, then explicitly replace those links with regular copies before retrying; the scripts never perform this migration automatically.
+
+Transport excludes `.git` files/directories, dependency/cache directories, incidental metadata, `.env`/`.env.*`, `auth.json`, and `config.toml`. Skill-relative runtime paths are also excluded: `company.json`, `copros.json`, `copros/`, `output/`, `data/journal-entries.json`, `data/transactions/`, `data/imports/`, and `data/invoices/` except `_template.json`. Existing destination data at these paths is preserved. Reference data, `company.example.json`, templates, and evaluation examples remain transportable. These are explicit path filters, not a general secret scanner: review newly allowlisted resources before publication.
+
+Local `config.toml` is never exported. Maintain `config/config.example.toml` separately with placeholders. New installs receive the template; instruction refreshes preserve existing model, tool, credential and approval settings.
+
+For Claude Code, keep the same project rules as the canonical content and use a small `CLAUDE.md` import (`@AGENTS.md`) after reconciling any existing Claude rules. Codex invocation policy is product-specific: an intentional Claude copy of an explicit-only skill needs `disable-model-invocation: true` in its SKILL frontmatter. Neither adapter transfers tool availability or proves behavior on another model.
 
 ## File Structure
 
@@ -196,7 +205,9 @@ codex-config/
 │   └── expo/
 │       └── AGENTS.md
 ├── scripts/
-│   └── apply-profile.py
+│   ├── apply-profile.py
+│   ├── copy-resources.py
+│   └── test-instruction-tools.py
 └── skills/
     ├── setup-next/
     │   ├── SKILL.md

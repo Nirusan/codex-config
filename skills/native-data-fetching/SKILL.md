@@ -1,13 +1,13 @@
 ---
 name: native-data-fetching
-description: Use when implementing or debugging ANY network request, API call, or data fetching. Covers fetch API, React Query, SWR, error handling, caching, offline support, and Expo Router data loaders (`useLoaderData`).
+description: Implement or debug Expo/React Native fetching, caching, offline behavior, retries or network error handling when that behavior changes.
 version: 1.0.0
 license: MIT
 ---
 
 # Expo Networking
 
-**You MUST use this skill for ANY networking work including API requests, data fetching, caching, or network debugging.**
+Use the relevant sections when changing or diagnosing Expo/React Native network behavior. An explanation of an unchanged query does not require this procedure or a live database audit.
 
 ## References
 

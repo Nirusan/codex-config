@@ -1,50 +1,19 @@
 ---
 name: db-check
-description: Check Supabase/Postgres database health, schema changes, migrations, RLS policies, grants, and advisors when available. Use after creating or modifying database migrations, RLS policies, schema, storage policies, or Supabase data paths. Do not rely on remote advisors alone; report clearly when live database access is unavailable.
+description: Review a database schema, migration, RLS policy, grant, function, storage policy, or a requested database health/performance issue. Skip unchanged client queries and tasks with no evidence of a database concern.
 ---
 
-# Database Check
+# Review the database change or issue
 
-Use this skill to verify database changes with evidence, not just schema confidence.
+1. Establish the exact database object, behavior, and environment in scope. Start with relevant migrations, schema, generated types, and callers. A local review does not require connecting to production.
+2. If live evidence is needed, resolve the project and database target from current configuration and task context before using configured Supabase MCP, CLI, or SQL tools. Use scoped read-only inspection; resolve a materially ambiguous target before accessing it.
+3. Select the relevant checks:
+   - Schema and migrations: constraints, nullability, compatibility with callers, data transformation assumptions, and generated types. Test migrations in a suitable disposable environment or an explicitly authorized target.
+   - RLS and grants: enablement, USING and WITH CHECK, ownership or team boundaries, anonymous/authenticated roles, and service-role or administrative bypasses. Exercise allowed and denied cases when possible.
+   - Functions: execution grants, privilege level, and a safe search_path for SECURITY DEFINER functions.
+   - Storage: bucket exposure and object policies for the relevant read/write operations.
+   - Performance: the actual query and workload, filters, pagination, indexes, and relationships. Plain EXPLAIN can inspect a plan; EXPLAIN ANALYZE executes the query and requires an appropriate safe dataset.
+4. Treat database advisors as additional evidence, not proof that application authorization or performance is correct.
+5. Report the target, findings, supporting evidence, and unverified conditions. Distinguish local migration files, an applied schema, and behavior under real roles.
 
-## Workflow
-
-1. Identify the database surface:
-   - changed migration files
-   - schema/types files
-   - RLS policies, grants, functions, triggers, storage policies
-   - application query or mutation paths touched by the change
-2. Check live Supabase access if MCP tools are available:
-   - list projects and resolve the intended project/ref
-   - list tables and policies
-   - run security and performance advisors
-3. If Supabase MCP tools are unavailable, do not dead-end.
-   - inspect local migrations and schema files
-   - use configured Supabase CLI or SQL access only if already available in the repo/environment
-   - report live checks as `not verified`
-4. For RLS or permission work, inspect policy semantics directly.
-   - allowed roles
-   - `using` and `with check` expressions
-   - ownership/team predicates
-   - service role or admin bypass paths
-5. For performance-sensitive changes, check indexes, foreign keys, query filters, pagination assumptions, and advisor output when available.
-6. If the change also touches app auth, API handlers, or query construction, use `$security-check` for the application layer.
-
-## Rules
-
-- Never say "No issues detected" unless the relevant live or local checks actually ran.
-- Distinguish `passed`, `failed`, `not configured`, and `not verified`.
-- Include project/ref, files inspected, commands/tools used, and advisor results when available.
-- Ask the user to choose only when multiple live projects are available and the target is not inferable.
-
-## Output
-
-Return a concise report:
-
-- scope inspected
-- live database access status
-- migrations/schema/policies reviewed
-- security findings
-- performance findings
-- checks not verified
-- recommended fixes or follow-up
+Do not apply production migrations, alter policies, reset databases, or repair data as a side effect of review. Existing authorization remains valid only for its exact effects and target. Review adjacent authorization in the affected path directly rather than calling security-check recursively.

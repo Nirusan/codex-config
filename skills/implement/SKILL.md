@@ -1,88 +1,15 @@
 ---
 name: implement
-description: Use when the user wants to implement a concrete feature, fix a bug, or execute the next planned chunk of work. Reads the relevant local rules, source, tests, and planning context; chooses the next actionable unit when a plan exists; implements carefully; validates the result; and updates related docs or progress when appropriate. Do not use for vague ideation or for end-of-session git finalization alone.
+description: Carry a concrete feature or bug fix through implementation and relevant verification. Use for requested code changes; skip for status-only questions, requirements exploration, or Git-only operations.
 ---
 
-# Implement
+# Implement the requested change
 
-Use this skill when it is time to actually change code.
+1. Establish the requested behavior and acceptance conditions from the task and applicable repository guidance. Inspect the affected source and relevant tests; read planning or design documents only when they constrain this change. Do not select a different task because a tracker exists.
+2. Check the working tree before editing. Preserve unrelated changes; use isolation when overlapping work or risk warrants it. For a bug, obtain a concrete reproduction or evidence of the failing path before choosing a fix.
+3. Make the smallest coherent change that completes the request. Preserve existing domain invariants, interfaces, and product conventions. Investigate surprising failures before stacking speculative fixes.
+4. Verify the changed behavior and complete repository-required checks. Use the repository's real commands, with pnpm for JavaScript packages. A wrapper that already runs a check does not require that check again. Reuse successful evidence for unchanged code and conditions unless a rerun is requested or a new concern warrants one.
+5. Update existing documentation or task status only when the change makes them inaccurate. Keep implementation, testing, delivery, and remaining manual acceptance distinct where relevant.
+6. Report the resulting behavior, relevant proof, and remaining limits. Complete all authorized work needed for the requested outcome.
 
-## Use when
-
-- the user wants a feature implemented
-- the user wants a bug fixed
-- a plan already exists and the next story should be executed
-- the work is concrete enough to act on now
-
-## Don't use when
-
-- the idea is still vague and needs product discovery
-- the main task is architecture planning
-- the user only wants to commit, push, or clean up git state
-
-## Goal
-
-Deliver one meaningful chunk of implementation end to end: understand, build, validate, and leave the project clearer than before.
-
-## Workflow
-
-1. Read the local rules first:
-   - `AGENTS.md`
-   - relevant repo docs
-   - the best available planning docs if they exist
-2. Inspect the actual implementation surface:
-   - run or read `git status --short` to avoid mixing unrelated work
-   - read the relevant source, tests, configuration, and existing patterns
-   - capture the original repro path, acceptance criteria, or expected behavior when available
-3. Determine the work unit:
-   - if a plan or progress tracker exists, or the next slice is ambiguous, use `$next-task`
-   - otherwise derive a small implementation slice from the user's request
-4. If isolation would materially help, use `$worktree-setup` before making changes:
-   - dirty worktree with unrelated changes
-   - risky or broad edits
-   - parallel branch or agent work
-5. Make a short execution plan before editing.
-6. Implement the smallest coherent slice that moves the task forward.
-7. If the work gets blocked by unclear failures, switch to `$systematic-debugging`.
-8. Validate the result with the lightest credible checks for the change.
-9. If the change establishes a reusable pattern or updates tracked work, use:
-   - `$update-docs`
-   - `$update-progress`
-10. Before claiming readiness, use `$completion-verification`.
-
-## Rules
-
-- Prefer one coherent slice over many half-finished edits.
-- Read before editing; avoid patching from assumptions when code, tests, or logs are available.
-- Do not auto-commit or auto-push unless the user explicitly asks for git finalization.
-- Work with the existing worktree; never revert unrelated user changes.
-- Keep the repo's patterns and conventions stronger than your personal preferences.
-- Be explicit about assumptions when planning docs are missing or incomplete.
-- If the user asked for a small fix, do not balloon it into a refactor unless necessary.
-
-## Validation guidance
-
-Choose the right level for the task:
-
-- targeted command or repro for the behavior changed
-- `$validate-quick` for a fast signal
-- `$validate` for fuller project validation
-- live browser check when UI, layout, or interaction changes
-- `$security-check` when the change touches auth, permissions, secrets, or sensitive data
-- `$db-check` after schema, migration, or RLS changes
-
-## Output expectations
-
-After using this skill, you should be able to state:
-
-- what was implemented
-- what was validated
-- what remains open
-- whether docs or progress were updated
-
-## Suggested companion skills
-
-- `$next-task`
-- `$worktree-setup`
-- `$systematic-debugging`
-- `$completion-verification`
+No companion skill is a mandatory step. Consult focused guidance when the problem requires it. Implementation alone does not authorize publishing, deployment, production data changes, or messages to others; carry forward any existing authorization for the exact action and target without asking again.

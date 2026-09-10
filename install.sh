@@ -15,8 +15,16 @@ SOURCE_REPO_URL="${SOURCE_REPO_URL:-https://github.com/Nirusan/codex-config.git}
 SOURCE_BRANCH="${SOURCE_BRANCH:-main}"
 ARCHIVE_URL="${ARCHIVE_URL:-https://github.com/Nirusan/codex-config/archive/refs/heads/$SOURCE_BRANCH.tar.gz}"
 REMOTE_SOURCE_DIR=""
+NORMALIZED_MANIFEST=""
+PREPARED_SOURCE_DIR=""
 
 cleanup_remote_source() {
+  if [[ -n "$NORMALIZED_MANIFEST" ]]; then
+    rm -f -- "$NORMALIZED_MANIFEST"
+  fi
+  if [[ -n "$PREPARED_SOURCE_DIR" && -d "$PREPARED_SOURCE_DIR" ]]; then
+    rm -rf -- "$PREPARED_SOURCE_DIR"
+  fi
   if [[ -n "$REMOTE_SOURCE_DIR" && -d "$REMOTE_SOURCE_DIR" ]]; then
     rm -rf "$REMOTE_SOURCE_DIR"
   fi
@@ -159,14 +167,14 @@ if [[ "$INSTALL_MODE" == "project" ]]; then
   TARGET_DIR="$(cd "$TARGET_PATH" && pwd)"
   CODEX_DIR="$TARGET_DIR/.codex"
   AGENTS_TARGET="$TARGET_DIR/AGENTS.md"
-  BACKUP_DIR="$TARGET_DIR/.codex-backup-$(date +%Y%m%d-%H%M%S)"
+  BACKUP_DIR="$TARGET_DIR/.codex-backup-$(date +%Y%m%d-%H%M%S)-XXXXXX"
   echo "==> Installing Codex configuration (PROJECT-level)..."
   echo "    Target: $TARGET_DIR"
 else
   TARGET_DIR="$HOME"
   CODEX_DIR="$HOME/.codex"
   AGENTS_TARGET="$CODEX_DIR/AGENTS.md"
-  BACKUP_DIR="$HOME/.codex-backup-$(date +%Y%m%d-%H%M%S)"
+  BACKUP_DIR="$HOME/.codex-backup-$(date +%Y%m%d-%H%M%S)-XXXXXX"
   echo "==> Installing Codex configuration (USER-level)..."
   echo "    Target: ~/.codex/"
 fi
@@ -176,6 +184,16 @@ if [[ "$LOCAL_INSTALL" == true ]]; then
 else
   echo "==> Installing from remote..."
   prepare_remote_source
+fi
+
+# Snapshot all safe resources and validate every managed destination before backups/writes.
+PREPARED_SOURCE_DIR="$(mktemp -d)"
+python3 "$SCRIPT_DIR/scripts/copy-resources.py" prepare-install \
+  "$SCRIPT_DIR" "$CODEX_DIR" "$AGENTS_TARGET" "$PREPARED_SOURCE_DIR"
+SCRIPT_DIR="$PREPARED_SOURCE_DIR"
+NORMALIZED_MANIFEST="$SCRIPT_DIR/config/skills-manifest.txt"
+if [[ "$INSTALL_MODE" == "project" && -n "$PROFILE" ]]; then
+  python3 "$SCRIPT_DIR/scripts/apply-profile.py" --profile "$PROFILE" --target "$TARGET_DIR" --profiles-dir "$SCRIPT_DIR/profiles" --check
 fi
 
 # Backup existing config if present.
@@ -202,106 +220,42 @@ if [[ ( -d "$CODEX_DIR" && "$(ls -A "$CODEX_DIR" 2>/dev/null)" ) || -f "$AGENTS_
   else
     echo "(--yes flag: skipping confirmation / option --yes : confirmation ignorée)"
   fi
+  BACKUP_DIR="$(mktemp -d "$BACKUP_DIR")"
   echo "==> Backing up existing config to $BACKUP_DIR..."
-  mkdir -p "$BACKUP_DIR"
   if [[ -d "$CODEX_DIR" ]]; then
-    cp -rP "$CODEX_DIR" "$BACKUP_DIR/" || true
+    chmod 700 "$BACKUP_DIR"
+    for item in AGENTS.md config.toml skills profiles scripts; do
+      if [[ -e "$CODEX_DIR/$item" ]]; then
+        cp -rP "$CODEX_DIR/$item" "$BACKUP_DIR/"
+      fi
+    done
   fi
   if [[ -f "$AGENTS_TARGET" ]]; then
-    cp -P "$AGENTS_TARGET" "$BACKUP_DIR/AGENTS.md" || true
+    cp -P "$AGENTS_TARGET" "$BACKUP_DIR/AGENTS.md"
   fi
 fi
 
 mkdir -p "$CODEX_DIR/skills"
 
-# Remove the legacy browser skill after the rename to dev-browser.
-if [[ -d "$CODEX_DIR/skills/playwright" ]]; then
-  rm -rf "$CODEX_DIR/skills/playwright"
-fi
+# Preserve existing skill directories; optional skills retain explicit invocation policies.
 
 install_file() {
   local src="$1"
   local dest="$2"
-  rm -f "$dest" 2>/dev/null || true
+  # Sources are regular files from the validated private snapshot.
+  rm -f "$dest"
   mkdir -p "$(dirname "$dest")"
-
-  if [[ "$LOCAL_INSTALL" == true ]]; then
-    cp "$SCRIPT_DIR/$src" "$dest"
-  else
-    # Fallback for unexpected partial remote installs. Normal remote installs
-    # fetch the complete repo first, then use the local-copy path above.
-    curl -fsSL "$REPO_URL/$src" -o "$dest"
-  fi
-}
-
-install_optional_file() {
-  local src="$1"
-  local dest="$2"
-  rm -f "$dest" 2>/dev/null || true
-  mkdir -p "$(dirname "$dest")"
-
-  if [[ "$LOCAL_INSTALL" == true ]]; then
-    if [[ -f "$SCRIPT_DIR/$src" ]]; then
-      cp "$SCRIPT_DIR/$src" "$dest"
-    fi
-  else
-    # Fallback for unexpected partial remote installs. Normal remote installs
-    # fetch the complete repo first, then use the local-copy path above.
-    curl -fsSL "$REPO_URL/$src" -o "$dest" 2>/dev/null || rm -f "$dest"
-  fi
-}
-
-extract_mcp_sections() {
-  local file="$1"
-  awk '
-    /^\[mcp_servers\.chrome-devtools(\.|$)/ { keep=0; skip_legacy=1; next }
-    /^\[mcp_servers\.gemini-design-mcp(\.|$)/ { keep=0; skip_gemini=1; next }
-    /^\[/ && skip_legacy && $0 !~ /^\[mcp_servers\.chrome-devtools(\.|$)/ { skip_legacy=0 }
-    /^\[/ && skip_gemini && $0 !~ /^\[mcp_servers\.gemini-design-mcp(\.|$)/ { skip_gemini=0 }
-    skip_legacy || skip_gemini { next }
-    /^\[mcp_servers(\.|$)/ && !skip_legacy { keep=1 }
-    /^\[/ && $0 !~ /^\[mcp_servers(\.|$)/ { keep=0 }
-    keep { print }
-  ' "$file"
-}
-
-strip_mcp_sections() {
-  local file="$1"
-  awk '
-    /^\[mcp_servers(\.|$)/ { skip=1; next }
-    /^\[/ && $0 !~ /^\[mcp_servers(\.|$)/ { skip=0 }
-    !skip { print }
-  ' "$file"
-}
-
-merge_mcp_sections() {
-  local new_file="$1"
-  local old_file="$2"
-  local tmp_new
-  local tmp_mcp
-  tmp_new="$(mktemp)"
-  tmp_mcp="$(mktemp)"
-
-  extract_mcp_sections "$old_file" > "$tmp_mcp"
-  if [[ -s "$tmp_mcp" ]]; then
-    strip_mcp_sections "$new_file" > "$tmp_new"
-    {
-      cat "$tmp_new"
-      echo ""
-      cat "$tmp_mcp"
-    } > "$new_file"
-  fi
-
-  rm -f "$tmp_new" "$tmp_mcp"
+  cp -p "$SCRIPT_DIR/$src" "$dest"
 }
 
 install_support_files() {
   echo "==> Installing profiles and helpers..."
-  install_file "scripts/apply-profile.py" "$CODEX_DIR/scripts/apply-profile.py"
-  chmod +x "$CODEX_DIR/scripts/apply-profile.py"
-
+  for helper_name in apply-profile.py copy-resources.py; do
+    install_file "scripts/$helper_name" "$CODEX_DIR/scripts/$helper_name"
+  done
   for profile_name in next expo; do
-    install_file "profiles/$profile_name/AGENTS.md" "$CODEX_DIR/profiles/$profile_name/AGENTS.md"
+    mkdir -p "$CODEX_DIR/profiles/$profile_name"
+    cp -pR "$SCRIPT_DIR/profiles/$profile_name/." "$CODEX_DIR/profiles/$profile_name/"
   done
 }
 
@@ -319,29 +273,16 @@ install_skill() {
   local skill_src="$SCRIPT_DIR/skills/$skill_name"
   local skill_dest="$CODEX_DIR/skills/$skill_name"
   mkdir -p "$skill_dest"
-
-  if [[ "$LOCAL_INSTALL" == true ]]; then
-    if [[ -d "$skill_src" ]]; then
-      cp -R "$skill_src/." "$skill_dest/"
-    fi
-  else
-    install_file "skills/$skill_name/SKILL.md" "$skill_dest/SKILL.md"
-    install_optional_file "skills/$skill_name/agents/openai.yaml" "$skill_dest/agents/openai.yaml"
-  fi
+  cp -pR "$skill_src/." "$skill_dest/"
 }
 
 echo "==> Copying config files..."
 install_support_files
 
-existing_config="$(mktemp)"
-if [[ -f "$CODEX_DIR/config.toml" ]]; then
-  cp "$CODEX_DIR/config.toml" "$existing_config"
+# An instruction refresh must not reset models, credentials, tools or approval settings.
+if [[ ! -f "$CODEX_DIR/config.toml" ]]; then
+  install_file "config/config.example.toml" "$CODEX_DIR/config.toml"
 fi
-install_file "config/config.example.toml" "$CODEX_DIR/config.toml"
-if [[ -s "$existing_config" ]]; then
-  merge_mcp_sections "$CODEX_DIR/config.toml" "$existing_config"
-fi
-rm -f "$existing_config"
 
 if [[ "$INSTALL_MODE" == "project" ]]; then
   if [[ -n "$PROFILE" ]]; then
@@ -354,59 +295,16 @@ else
 fi
 
 echo "==> Installing skills..."
-SKILLS=(
-  "brainstorm"
-  "building-native-ui"
-  "db-check"
-  "design-director"
-  "design-principles"
-  "eas-update-insights"
-  "expo-api-routes"
-  "expo-cicd-workflows"
-  "expo-deployment"
-  "expo-dev-client"
-  "expo-module"
-  "expo-tailwind-setup"
-  "expo-ui-jetpack-compose"
-  "expo-ui-swift-ui"
-  "completion-verification"
-  "frontend-skill"
-  "git-add-commit-push"
-  "humanizer"
-  "implement"
-  "implementation-plan"
-  "minimalist-skill"
-  "native-data-fetching"
-  "next-task"
-  "output-skill"
-  "dev-browser"
-  "permissions-allow"
-  "prd"
-  "refresh-context"
-  "redesign-skill"
-  "responsive-frontend-designs"
-  "security-check"
-  "seo-check"
-  "setup-expo"
-  "setup-next"
-  "soft-skill"
-  "systematic-debugging"
-  "taste-skill"
-  "sync-config"
-  "tech-stack"
-  "upgrading-expo"
-  "update-docs"
-  "update-progress"
-  "validate"
-  "validate-quick"
-  "validate-update-push"
-  "worktree-setup"
-  "browser-based-games"
-  "use-dom"
-)
-for skill in "${SKILLS[@]}"; do
+# The manifest covers nested skills and complete resources; do not silently reinstall retired entries.
+while IFS= read -r skill || [[ -n "$skill" ]]; do
+  [[ -z "$skill" || "$skill" == \#* ]] && continue
+  if [[ "$skill" == /* || "/$skill/" == *"/../"* || ! -f "$SCRIPT_DIR/skills/$skill/SKILL.md" ]]; then
+    echo "error: invalid or missing skill manifest entry: $skill" >&2
+    exit 1
+  fi
   install_skill "$skill"
-done
+done < "$NORMALIZED_MANIFEST"
+cp "$NORMALIZED_MANIFEST" "$CODEX_DIR/skills-manifest.txt"
 
 echo ""
 echo "==> Installation complete!"
@@ -416,7 +314,7 @@ if [[ "$INSTALL_MODE" == "project" ]]; then
   echo "  - $TARGET_DIR/.codex/config.toml"
   echo "  - $TARGET_DIR/.codex/skills/*"
   echo "  - $TARGET_DIR/.codex/profiles/*"
-  echo "  - $TARGET_DIR/.codex/scripts/apply-profile.py"
+  echo "  - $TARGET_DIR/.codex/scripts/{apply-profile,copy-resources}.py"
   if [[ -n "$PROFILE" ]]; then
     echo "  - $TARGET_DIR/AGENTS.md profile block: $PROFILE"
   else
@@ -428,7 +326,7 @@ else
   echo "  - ~/.codex/config.toml"
   echo "  - ~/.codex/skills/*"
   echo "  - ~/.codex/profiles/*"
-  echo "  - ~/.codex/scripts/apply-profile.py"
+  echo "  - ~/.codex/scripts/{apply-profile,copy-resources}.py"
 fi
 
 echo ""

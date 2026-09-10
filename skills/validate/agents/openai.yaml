@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $validate to run the full validation suite for this repo."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

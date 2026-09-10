@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $update-docs to refresh durable project documentation after this change."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

@@ -1,72 +1,15 @@
 ---
 name: next-task
-description: Use when the user asks what to work on next, wants the next incomplete story from a plan, or needs a concise status-based recommendation. Reads the current plan and progress tracker, identifies the next actionable item, and explains any blockers or missing prerequisites. Do not use when no plan exists and the user actually needs planning first.
+description: Choose the next useful task from an existing goal, plan, or work queue when the user asks what to do next. Skip when the user has already selected the work or only asks for status.
 ---
 
-# Next Task
+# Choose the next task
 
-Use this skill to answer "what should we do next?" from actual project state.
+1. Read the relevant goal and current queue or tracker, if one exists. Follow the repository's stated source-of-truth order; do not load unrelated planning documents.
+2. Check enough implementation and working tree evidence to avoid recommending completed work or colliding with active changes.
+3. Select an actionable task using stated priorities, dependencies, user impact, and blockers. The first unchecked item is not necessarily ready. Explain any departure from the recorded order.
+4. Give a concrete next task, why it comes next, its completion condition, and any blocking dependency. Do not present unverified tracker status as current fact.
 
-## Use when
+If no plan exists, recommend a bounded next step from the user's goal and available evidence; do not require a new planning workflow. Ask for missing direction only when it materially changes the choice.
 
-- the user asks for the next task
-- a plan exists and the next unfinished story should be identified
-- the user wants a quick status-based recommendation
-
-## Don't use when
-
-- there is no plan or tracking doc and the user really needs one
-- the task is brainstorming rather than execution sequencing
-
-## Workflow
-
-1. Read the best available plan and progress files.
-2. Follow the repo's existing planning structure rather than inventing a new one.
-3. Check lightweight repo reality before trusting trackers:
-   - `git status --short`
-   - recent commits or diffs when they are relevant to the active plan
-   - files touched for the current feature or story
-4. Compare:
-   - remaining stories
-   - current story
-   - explicit blockers or dependencies
-   - evidence that tracked work is already done or stale
-5. Identify the next actionable task, not just the first unchecked line.
-6. If no plan exists, say so and recommend the appropriate planning step instead.
-
-## Path resolution
-
-Prefer this order:
-
-1. feature-level `memory-bank/features/<feature>/plan.md` + `progress.md` when clearly in scope
-2. `memory-bank/plan.md` + `memory-bank/progress.md`
-3. `docs/implementation-plan.md` + `docs/progress.md`
-4. the closest equivalent tracked docs already used by the repo
-
-## Output format
-
-Return a concise status block with:
-
-- current phase or area if known
-- what is already done
-- the next story or task
-- why that is the next task
-- any blocker or prerequisite
-
-## If everything is done
-
-Say so clearly and recommend the next sensible move, such as:
-
-- validation
-- documentation cleanup
-- a new feature plan
-
-## If the plan is unclear
-
-Do not guess too hard. State the ambiguity and suggest:
-
-- `$refresh-context` if the repo state itself is unfamiliar
-- `$brainstorm` or `$prd` if the ambiguity is product-level
-- `$implementation-plan`
-- `$implement` if the next execution slice is clear after the status read
-- or a direct clarification question if that is the shortest path
+Choosing a task does not authorize executing it. Continue into implementation when the user requested that work, such as "take the next task and implement it"; otherwise return the recommendation.

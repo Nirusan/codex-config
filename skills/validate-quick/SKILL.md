@@ -1,53 +1,13 @@
 ---
 name: validate-quick
-description: Quick validation check returning a compact pass/fail signal before commit, push, or a lightweight readiness claim. Runs the fastest meaningful checks available for the repo, preferring lint or type checks over heavier validation, and only falls back to broader checks when the repo lacks a lighter trustworthy gate.
+description: Obtain a fast, bounded confidence check for a small change or an explicit quick validation request. Skip when full validation is requested or the repository requires a broader gate.
 ---
 
-# Quick Validation Check
+# Check the changed behavior quickly
 
-Use this skill when you need a fast confidence signal, not a full QA pass.
+1. Inspect the affected diff and available repository scripts. Choose the smallest check that meaningfully covers the change: a focused regression test, type check, lint, or build as appropriate. Lint alone does not prove a behavior fix.
+2. Reuse a relevant successful check on unchanged code and conditions; run it again when requested or when new changes or concerns require it. Use pnpm for JavaScript package scripts.
+3. If it fails, diagnose the specific failure. Expand checking only when the failure, affected dependencies, or repository requirements justify it.
+4. Report the command, result, scope covered, and material checks still outstanding.
 
-## Use when
-
-- before commit or push
-- when the user asks "is it ready?" and a quick signal is enough
-- when you want a lightweight preflight before deeper validation
-
-## Don't use when
-
-- the user wants full validation output
-- the claim depends on a specific repro path rather than generic project health
-- you already know the change needs deeper testing
-
-## Process
-
-1. Inspect `package.json` or the repo tooling to find the fastest meaningful checks.
-2. Prefer this order:
-   - `pnpm lint`
-   - `pnpm typecheck`
-   - `pnpm build` only when no lighter structural check exists or build is the repo's real fast gate
-3. Run at most the minimum needed to produce a credible quick signal.
-4. Return compact pass/fail output with the exact commands run and skipped.
-
-## Output format
-
-**All pass**
-```md
-✅ Quick validation passed
-- Lint: OK
-- Typecheck: OK
-```
-
-**Failure**
-```md
-❌ Quick validation failed
-- Lint: FAILED
-- Typecheck: Skipped
-```
-
-## Rules
-
-- No long error dump; use `$validate` for detailed output.
-- Do not pretend this replaces task-specific verification.
-- Do not imply skipped checks passed.
-- If the repo's only meaningful gate is heavier, say so plainly.
+A quick pass is limited evidence. It does not replace repository-required checks or establish full release readiness. Do not chain another validation or completion skill just to repeat the same proof.

@@ -29,6 +29,14 @@ else
     rsync -a --delete --exclude '.git' --exclude '.DS_Store' "$SOURCE_CODEX_DIR/memories/" "$MEMORY_REPO/memories/"
     echo "    ✓ memories/"
   fi
+  # Private project skills stay out of the public allowlist (decision 2026-10-20)
+  for skill_dir in "$SOURCE_CODEX_DIR/skills"/mintdex-*/; do
+    [[ -d "$skill_dir" ]] || continue
+    skill_name=$(basename "$skill_dir")
+    mkdir -p "$MEMORY_REPO/skills/$skill_name"
+    rsync -a --delete --exclude '.DS_Store' "${skill_dir%/}/" "$MEMORY_REPO/skills/$skill_name/"
+    echo "    ✓ skills/$skill_name/"
+  done
   if [[ -f "$SOURCE_CODEX_DIR/memory.md" ]]; then
     cp "$SOURCE_CODEX_DIR/memory.md" "$MEMORY_REPO/memory.md"
     echo "    ✓ memory.md"
